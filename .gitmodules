@@ -9,26 +9,26 @@
 	url = https://github.com/mwh/dragon.git
 [submodule "wallpapers"]
 	path = wallpapers
-	url = git@github.com:tomato4/wallpapers.git
+	url = git@github.com:glazrtom/wallpapers.git
 [submodule "polybar/modules_binary/polybar-forecast"]
 	path = polybar/modules_binary/polybar-forecast
 	url = https://github.com/skyme5/polybar-forecast.git
 [submodule "polybar/modules_binary/polybar-cryptocurrency"]
 	path = polybar/modules_binary/polybar-cryptocurrency
-	url = git@github.com:tomato4/polybar-cryptocurrency.git
+	url = git@github.com:glazrtom/polybar-cryptocurrency.git
 [submodule "polybar/modules_binary/polybar-spotify"]
 	path = polybar/modules_binary/polybar-spotify
 	url = https://github.com/Jvanrhijn/polybar-spotify.git
 [submodule "fonts"]
 	path = fonts
-	url = git@github.com:tomato4/fonts.git
+	url = git@github.com:glazrtom/fonts.git
 [submodule "qutebrowser/dracula"]
 	path = qutebrowser/dracula
 	url = https://github.com/dracula/qutebrowser-dracula-theme.git
 	ignore = dirty
 [submodule "wallpapers_animated"]
 	path = wallpapers_animated
-	url = git@github.com:tomato4/wallpapers_animated.git
+	url = git@github.com:glazrtom/wallpapers_animated.git
 [submodule "Kde/Theme/Layan/Layan-gtk-theme"]
 	path = Kde/Theme/Layan/Layan-gtk-theme
 	url = https://github.com/vinceliuice/Layan-gtk-theme.git
@@ -43,7 +43,7 @@
 	url = https://github.com/romkatv/powerlevel10k.git
 [submodule "themes/dracula"]
 	path = themes/dracula
-	url = git@github.com:tomato4/dracula.git
+	url = git@github.com:glazrtom/dracula.git
 [submodule "zsh/zsh-autocomplete"]
 	path = zsh/zsh-autocomplete
 	url = https://github.com/marlonrichert/zsh-autocomplete.git

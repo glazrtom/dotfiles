@@ -2,7 +2,7 @@
   hosts: all
   vars:
     path_dotfiles: "{{ path_home }}/dotfiles"
-    repo_dotfiles: "git@github.com:tomato4/dotfiles.git"
+    repo_dotfiles: "git@github.com:glazrtom/dotfiles.git"
   tasks:
     - name: Ensure git is installed
       become: true

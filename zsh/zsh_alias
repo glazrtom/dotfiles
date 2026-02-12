@@ -79,6 +79,7 @@ alias gf='git fetch --all'
 
 # Kubernetes shortcuts
 alias k='kubectl'
+compdef kubectl k
 
 # custom shortcuts
 alias e='exit'

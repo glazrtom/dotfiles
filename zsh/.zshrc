@@ -29,10 +29,6 @@ IS_MAC=$?
 [[ "$(cat /etc/os-release | grep -i 'ID_LIKE=debian')" ]]
 IS_DEBIAN_BASED=$?
 
-# Disable case sensitive completion
-autoload -Uz compinit && compinit
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-
 # History setup:
 HISTSIZE=10000
 SAVEHIST=9999
@@ -44,10 +40,11 @@ setopt hist_ignore_dups
 setopt hist_verify
 
 # Basic auto/tab complete:
-autoload -U compinit
+autoload -U compinit && compinit
 zstyle ':completion:*' menu select
+# Disable case sensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zmodload zsh/complist
-compinit
 _comp_options+=(globdots)               # Include hidden files.
 
 # Custom ZSH Binds
@@ -74,6 +71,13 @@ else
   ZSH_BASE="/usr/share"
 fi
 
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+if command -v kubectl &>/dev/null; then
+    source <(kubectl completion zsh)
+    source <(kubectl netshoot completion zsh 2>/dev/null) || true
+    compdef _kubectl kubectl-netshoot 2>/dev/null || true
+fi
+
 if [[ $IS_MAC -eq 0 || $IS_DEBIAN_BASED -eq 0 ]]; then
   ZSH_AUTOSUGGESTIONS="$ZSH_BASE/zsh-autosuggestions/zsh-autosuggestions.zsh"
   ZSH_HIGHLIGHTING="$ZSH_BASE/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
@@ -89,6 +93,7 @@ source "$ZSH_AUTOSUGGESTIONS"
 source "$ZSH_HIGHLIGHTING"
 source "$AUTOJUMP"
 source $DOTFILES_ZSH/powerlevel10k/powerlevel10k.zsh-theme
+# source $DOTFILES_ZSH/completions/*.zsh
 
 # fishlike history search
 if [ -f "$DOTFILES_ZSH/zsh-history-substring-search/zsh-history-substring-search.zsh" ]
@@ -105,6 +110,10 @@ fi
 
 # Created by `pipx` on 2025-09-06 21:03:10
 export PATH="$PATH:~/.local/bin"
+export PATH="$HOME/.mint/bin:$PATH"
+export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+
+eval "$(/Users/tom/.local/bin/mise activate zsh)"
 
 # welcome screen
 fastfetch
