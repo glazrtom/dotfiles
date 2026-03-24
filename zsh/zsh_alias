@@ -128,166 +128,166 @@ function mkcd {
 }
 
 function git_clean_gone () {
-	git fetch --all -p
+  git fetch --all -p
 
-	local branches=()
-	local worktrees=()
-	local wt_count=0
+  local branches=()
+  local worktrees=()
+  local wt_count=0
 
-	while read -r branch; do
-		branches+=("$branch")
-		worktree=$(git worktree list --porcelain | grep -B2 "^branch refs/heads/${branch}$" | grep "^worktree " | sed 's/^worktree //')
-		if [ -n "$worktree" ]; then
-			worktrees+=("$worktree")
-			wt_count=$((wt_count + 1))
-			echo "  $branch  [worktree: $worktree — will be removed]"
-		else
-			worktrees+=("")
-			echo "  $branch"
-		fi
-	done < <(git branch -vv | grep --color=never ": gone]" | awk '{ print ($1 == "+" || $1 == "*" ? $2 : $1) }')
+  while read -r branch; do
+    branches+=("$branch")
+    worktree=$(git worktree list --porcelain | grep -B2 "^branch refs/heads/${branch}$" | grep "^worktree " | sed 's/^worktree //')
+    if [ -n "$worktree" ]; then
+      worktrees+=("$worktree")
+      wt_count=$((wt_count + 1))
+      echo "  $branch  [worktree: $worktree — will be removed]"
+    else
+      worktrees+=("")
+      echo "  $branch"
+    fi
+  done < <(git branch -vv | grep --color=never ": gone]" | awk '{ print ($1 == "+" || $1 == "*" ? $2 : $1) }')
 
-	if [ ${#branches[@]} -eq 0 ]; then
-		echo "Nothing to clean up."
-		return 0
-	fi
+  if [ ${#branches[@]} -eq 0 ]; then
+    echo "Nothing to clean up."
+    return 0
+  fi
 
-	echo ""
-	echo "Will delete ${#branches[@]} branch(es) and $wt_count worktree(s)."
-	echo ""
-	echo -n "Proceed? [y/N] "
-	read -r confirm
-	if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-		echo "Aborted."
-		return 0
-	fi
+  echo ""
+  echo "Will delete ${#branches[@]} branch(es) and $wt_count worktree(s)."
+  echo ""
+  echo -n "Proceed? [y/N] "
+  read -r confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    return 0
+  fi
 
-	echo ""
-	for i in $(seq 1 ${#branches[@]}); do
-		if [ -n "${worktrees[$i]}" ]; then
-			echo "Removing worktree for '${branches[$i]}' at ${worktrees[$i]}"
-			git worktree remove --force "${worktrees[$i]}"
-		fi
-		echo "Removing branch ${branches[$i]}"
-		git branch -D "${branches[$i]}"
-	done
+  echo ""
+  for i in $(seq 1 ${#branches[@]}); do
+    if [ -n "${worktrees[$i]}" ]; then
+      echo "Removing worktree for '${branches[$i]}' at ${worktrees[$i]}"
+      git worktree remove --force "${worktrees[$i]}"
+    fi
+    echo "Removing branch ${branches[$i]}"
+    git branch -D "${branches[$i]}"
+  done
 
-	echo ""
-	echo "Done. Removed $wt_count worktree(s) and ${#branches[@]} branch(es)."
+  echo ""
+  echo "Done. Removed $wt_count worktree(s) and ${#branches[@]} branch(es)."
 }
 
 function git_clean_wt_nochange () {
-	local worktree_paths=()
-	local worktree_branches=()
-	local current_dir=$(pwd)
+  local worktree_paths=()
+  local worktree_branches=()
+  local current_dir=$(pwd)
 
-	while IFS= read -r line; do
-		if [[ "$line" == worktree\ * ]]; then
-			wt_path="${line#worktree }"
-		elif [[ "$line" == "branch "* ]]; then
-			wt_branch="${line#branch refs/heads/}"
-		elif [[ -z "$line" ]]; then
-			# skip the main worktree (first entry has no branch or is the main one)
-			if [ -n "$wt_path" ] && [ -n "$wt_branch" ]; then
-				# check if worktree has no uncommitted changes and no unpushed commits
-				if git -C "$wt_path" diff --quiet 2>/dev/null && \
-				   git -C "$wt_path" diff --cached --quiet 2>/dev/null && \
-				   [ -z "$(git -C "$wt_path" ls-files --others --exclude-standard 2>/dev/null)" ]; then
-					# check for unpushed commits
-					local upstream=$(git -C "$wt_path" rev-parse --abbrev-ref "${wt_branch}@{upstream}" 2>/dev/null)
-					if [ -n "$upstream" ]; then
-						local ahead=$(git -C "$wt_path" rev-list --count "${upstream}..${wt_branch}" 2>/dev/null)
-						if [ "$ahead" -eq 0 ] 2>/dev/null; then
-							worktree_paths+=("$wt_path")
-							worktree_branches+=("$wt_branch")
-						fi
-					else
-						# no upstream — check if branch is merged into HEAD of main worktree
-						if git merge-base --is-ancestor "$wt_branch" HEAD 2>/dev/null; then
-							worktree_paths+=("$wt_path")
-							worktree_branches+=("$wt_branch")
-						fi
-					fi
-				fi
-			fi
-			wt_path=""
-			wt_branch=""
-		fi
-	done < <(git worktree list --porcelain; echo "")
+  while IFS= read -r line; do
+    if [[ "$line" == worktree\ * ]]; then
+      wt_path="${line#worktree }"
+    elif [[ "$line" == "branch "* ]]; then
+      wt_branch="${line#branch refs/heads/}"
+    elif [[ -z "$line" ]]; then
+      # skip the main worktree (first entry has no branch or is the main one)
+      if [ -n "$wt_path" ] && [ -n "$wt_branch" ]; then
+        # check if worktree has no uncommitted changes and no unpushed commits
+        if git -C "$wt_path" diff --quiet 2>/dev/null && \
+           git -C "$wt_path" diff --cached --quiet 2>/dev/null && \
+           [ -z "$(git -C "$wt_path" ls-files --others --exclude-standard 2>/dev/null)" ]; then
+          # check for unpushed commits
+          local upstream=$(git -C "$wt_path" rev-parse --abbrev-ref "${wt_branch}@{upstream}" 2>/dev/null)
+          if [ -n "$upstream" ]; then
+            local ahead=$(git -C "$wt_path" rev-list --count "${upstream}..${wt_branch}" 2>/dev/null)
+            if [ "$ahead" -eq 0 ] 2>/dev/null; then
+              worktree_paths+=("$wt_path")
+              worktree_branches+=("$wt_branch")
+            fi
+          else
+            # no upstream — check if branch is merged into HEAD of main worktree
+            if git merge-base --is-ancestor "$wt_branch" HEAD 2>/dev/null; then
+              worktree_paths+=("$wt_path")
+              worktree_branches+=("$wt_branch")
+            fi
+          fi
+        fi
+      fi
+      wt_path=""
+      wt_branch=""
+    fi
+  done < <(git worktree list --porcelain; echo "")
 
-	if [ ${#worktree_paths[@]} -eq 0 ]; then
-		echo "No worktrees to clean up."
-		return 0
-	fi
+  if [ ${#worktree_paths[@]} -eq 0 ]; then
+    echo "No worktrees to clean up."
+    return 0
+  fi
 
-	echo "The following worktrees have no uncommitted changes and no unpushed commits:"
-	echo ""
-	for i in $(seq 1 ${#worktree_paths[@]}); do
-		echo "  ${worktree_branches[$i]}  [${worktree_paths[$i]}]"
-	done
+  echo "The following worktrees have no uncommitted changes and no unpushed commits:"
+  echo ""
+  for i in $(seq 1 ${#worktree_paths[@]}); do
+    echo "  ${worktree_branches[$i]}  [${worktree_paths[$i]}]"
+  done
 
-	echo ""
-	echo "Will remove ${#worktree_paths[@]} worktree(s) and delete their branches."
-	echo ""
-	echo -n "Proceed? [y/N] "
-	read -r confirm
-	if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-		echo "Aborted."
-		return 0
-	fi
+  echo ""
+  echo "Will remove ${#worktree_paths[@]} worktree(s) and delete their branches."
+  echo ""
+  echo -n "Proceed? [y/N] "
+  read -r confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    return 0
+  fi
 
-	echo ""
-	for i in $(seq 1 ${#worktree_paths[@]}); do
-		echo "Removing worktree '${worktree_branches[$i]}' at ${worktree_paths[$i]}"
-		git worktree remove --force "${worktree_paths[$i]}"
-		git branch -D "${worktree_branches[$i]}" 2>/dev/null
-	done
+  echo ""
+  for i in $(seq 1 ${#worktree_paths[@]}); do
+    echo "Removing worktree '${worktree_branches[$i]}' at ${worktree_paths[$i]}"
+    git worktree remove --force "${worktree_paths[$i]}"
+    git branch -D "${worktree_branches[$i]}" 2>/dev/null
+  done
 
-	echo ""
-	echo "Done. Removed ${#worktree_paths[@]} worktree(s)."
+  echo ""
+  echo "Done. Removed ${#worktree_paths[@]} worktree(s)."
 }
 
 function android_clean () {
-	local dirs=()
+  local dirs=()
 
-	while IFS= read -r dir; do
-		dirs+=("$dir")
-	done < <(find . -type d \( -name "build" -o -name ".gradle" -o -name ".cxx" \) -not -path "./.git/*" 2>/dev/null)
+  while IFS= read -r dir; do
+    dirs+=("$dir")
+  done < <(find . -type d \( -name "build" -o -name ".gradle" -o -name ".cxx" \) -not -path "./.git/*" 2>/dev/null)
 
-	if [ ${#dirs[@]} -eq 0 ]; then
-		echo "Nothing to clean up."
-		return 0
-	fi
+  if [ ${#dirs[@]} -eq 0 ]; then
+    echo "Nothing to clean up."
+    return 0
+  fi
 
-	echo "Found ${#dirs[@]} build directories:"
-	echo ""
-	for dir in "${dirs[@]}"; do
-		local size=$(du -sh "$dir" 2>/dev/null | awk '{ print $1 }')
-		echo "  $dir  ($size)"
-	done
+  echo "Found ${#dirs[@]} build directories:"
+  echo ""
+  for dir in "${dirs[@]}"; do
+    local size=$(du -sh "$dir" 2>/dev/null | awk '{ print $1 }')
+    echo "  $dir  ($size)"
+  done
 
-	local total_kb=$(du -sc "${dirs[@]}" 2>/dev/null | tail -1 | awk '{ print $1 }')
-	local total_human=$(echo "$total_kb" | awk '{
-		if ($1 >= 1048576) printf "%.1fG", $1/1048576
-		else if ($1 >= 1024) printf "%.1fM", $1/1024
-		else printf "%dK", $1
-	}')
+  local total_kb=$(du -sc "${dirs[@]}" 2>/dev/null | tail -1 | awk '{ print $1 }')
+  local total_human=$(echo "$total_kb" | awk '{
+    if ($1 >= 1048576) printf "%.1fG", $1/1048576
+    else if ($1 >= 1024) printf "%.1fM", $1/1024
+    else printf "%dK", $1
+  }')
 
-	echo ""
-	echo "Total: $total_human"
-	echo ""
-	echo -n "Delete all? [y/N] "
-	read -r confirm
-	if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-		echo "Aborted."
-		return 0
-	fi
+  echo ""
+  echo "Total: $total_human"
+  echo ""
+  echo -n "Delete all? [y/N] "
+  read -r confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    return 0
+  fi
 
-	for dir in "${dirs[@]}"; do
-		rm -rf "$dir"
-	done
+  for dir in "${dirs[@]}"; do
+    rm -rf "$dir"
+  done
 
-	echo "Done. Removed ${#dirs[@]} directories."
+  echo "Done. Removed ${#dirs[@]} directories."
 }
 
 function gwc() {
