@@ -198,8 +198,8 @@ function git_clean_wt_nochange () {
     elif [[ "$line" == "branch "* ]]; then
       wt_branch="${line#branch refs/heads/}"
     elif [[ -z "$line" ]]; then
-      # skip the main worktree (first entry has no branch or is the main one)
-      if [ -n "$wt_path" ] && [ -n "$wt_branch" ]; then
+      # skip the main worktree — only process paths containing .worktrees/
+      if [ -n "$wt_path" ] && [ -n "$wt_branch" ] && [[ "$wt_path" == *".worktrees/"* ]]; then
         # check if worktree has no uncommitted changes and no unpushed commits
         if git -C "$wt_path" diff --quiet 2>/dev/null && \
            git -C "$wt_path" diff --cached --quiet 2>/dev/null && \
@@ -322,7 +322,8 @@ function gwc() {
     local main_repo
     main_repo=$(git worktree list --porcelain | awk '/^worktree / { print $2; exit }') || return 1
     local current_folder="${main_repo:t}"
-    local worktree_folder="${main_repo:h}/$current_folder.worktrees/$branch"
+    local safe_branch="${branch//\#/}"
+    local worktree_folder="${main_repo:h}/$current_folder.worktrees/$safe_branch"
 
     # Check if worktree already exists
     if git worktree list --porcelain | grep -qF "worktree $worktree_folder"; then
