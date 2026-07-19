@@ -111,9 +111,12 @@ fi
 # Created by `pipx` on 2025-09-06 21:03:10
 export PATH="$PATH:~/.local/bin"
 export PATH="$HOME/.mint/bin:$PATH"
-export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+export PATH="$JAVA_HOME/bin:$PATH"
 
-eval "$(/Users/tom/.local/bin/mise activate zsh)"
+eval "$($HOME/.local/bin/mise activate zsh)"
 
 # welcome screen
 fastfetch
+
+# opencode
+export PATH="$HOME/.opencode/bin:$PATH"

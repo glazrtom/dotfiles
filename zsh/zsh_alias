@@ -317,6 +317,20 @@ function gwc() {
     fi
 
     local branch="$1"
+    local stashed=0
+
+    # Check for uncommitted changes and offer to transfer them
+    if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+        echo "You have uncommitted changes:"
+        git status --short
+        echo ""
+        echo -n "Copy them to the new worktree? [y/N] "
+        read -r copy_changes
+        if [[ "$copy_changes" =~ ^[Yy]$ ]]; then
+            git stash push --include-untracked -m "gwc: transferring to $branch" || return 1
+            stashed=1
+        fi
+    fi
 
     # Find main repo root (works from any worktree)
     local main_repo
@@ -328,14 +342,23 @@ function gwc() {
     # Check if worktree already exists
     if git worktree list --porcelain | grep -qF "worktree $worktree_folder"; then
         echo "Worktree for '$branch' already exists at $worktree_folder"
-        cd "$worktree_folder"
+        if [[ $stashed -eq 1 ]]; then
+            cd "$worktree_folder"
+            echo "Applying stashed changes..."
+            git stash pop || echo "Warning: stash pop had conflicts. Resolve them manually."
+        else
+            cd "$worktree_folder"
+        fi
         return 0
     fi
 
     # Check if branch exists locally or on a remote
     if git show-ref --verify --quiet "refs/heads/$branch"; then
         echo "Branch '$branch' exists locally. Adding worktree..."
-        git worktree add "$worktree_folder" "$branch" || return 1
+        if ! git worktree add "$worktree_folder" "$branch"; then
+            [[ $stashed -eq 1 ]] && echo "Restoring stashed changes..." && git stash pop
+            return 1
+        fi
     else
         # Fetch to ensure we have up-to-date remote refs
         git fetch --all --quiet
@@ -343,14 +366,20 @@ function gwc() {
         remote_ref=$(git for-each-ref --format='%(refname:short)' "refs/remotes/*/$branch" | head -1)
         if [[ -n "$remote_ref" ]]; then
             echo "Branch '$branch' found on remote ($remote_ref). Adding worktree..."
-            git worktree add --track -b "$branch" "$worktree_folder" "$remote_ref" || return 1
+            if ! git worktree add --track -b "$branch" "$worktree_folder" "$remote_ref"; then
+                [[ $stashed -eq 1 ]] && echo "Restoring stashed changes..." && git stash pop
+                return 1
+            fi
         else
             echo "Branch '$branch' does not exist locally or on any remote."
             local base_branch
             base_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
             vared -p "Create from which branch? [default: $base_branch] " base_branch
             echo "Creating branch '$branch' from '$base_branch' and adding worktree..."
-            git worktree add -b "$branch" "$worktree_folder" "$base_branch" || return 1
+            if ! git worktree add -b "$branch" "$worktree_folder" "$base_branch"; then
+                [[ $stashed -eq 1 ]] && echo "Restoring stashed changes..." && git stash pop
+                return 1
+            fi
         fi
     fi
 
@@ -361,11 +390,18 @@ function gwc() {
     pushd "$main_repo" > /dev/null
     [[ -f .idea/workspace.xml ]] && mkdir -p "$worktree_folder/.idea" && cp .idea/workspace.xml "$worktree_folder/.idea/workspace.xml" && echo "  - Copied .idea/workspace.xml"
     [[ -f secrets.properties ]] && cp secrets.properties "$worktree_folder/secrets.properties" && echo "  - Copied secrets.properties"
+    [[ -f local.properties ]] && cp local.properties "$worktree_folder/local.properties" && echo "  - Copied local.properties"
     find . -name "*.local*" -type f -exec gcp --parents -t "$worktree_folder" {} + 2>/dev/null && echo "  - Copied *.local* files"
     popd > /dev/null
 
     echo "Done. Switching to worktree..."
     cd "$worktree_folder"
+
+    # Apply stashed changes in the new worktree
+    if [[ $stashed -eq 1 ]]; then
+        echo "Applying stashed changes..."
+        git stash pop || echo "Warning: stash pop had conflicts. Resolve them manually."
+    fi
 }
 
 _gwc() {
@@ -425,4 +461,6 @@ function gitCurrentBranch {
 #}
 
 alias bigfolders="sudo du -h -d 1 . 2>/dev/null | sort -hr | head -n 20"
+
+alias mise-install='MISE_GITLAB_ENTERPRISE_TOKEN=$(security find-generic-password -a "mise" -s "GITLAB_TOKEN" -w) mise install'
 
