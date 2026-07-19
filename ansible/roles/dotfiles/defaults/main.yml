@@ -1,0 +1,18 @@
+# Transport for cloning the dotfiles repo + submodules:
+#   ssh   -> clone everything (incl. private submodules); auto-generates an SSH
+#            key and waits for you to add it to GitHub if not yet authenticated.
+#   https -> clone over HTTPS and init only the public submodules below.
+# Override per host, e.g.  -e dotfiles_transport=ssh
+dotfiles_transport: https
+
+repo_dotfiles_ssh: "git@github.com:glazrtom/dotfiles.git"
+repo_dotfiles_https: "https://github.com/glazrtom/dotfiles.git"
+
+# Public, CLI-relevant submodules initialised in HTTPS mode (no auth needed).
+dotfiles_submodules:
+  - zsh/powerlevel10k
+  - zsh/zsh-autocomplete
+  - zsh/zsh-history-substring-search
+  - ranger/plugins/ranger_devicons
+
+ssh_key_path: "{{ ansible_facts.env.HOME }}/.ssh/id_ed25519"

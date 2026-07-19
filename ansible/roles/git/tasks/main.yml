@@ -1,0 +1,25 @@
+- name: Ensure git is installed
+  become: true
+  package:
+    name: git
+    state: present
+
+- name: Copy git config
+  copy:
+    src: "{{ path_dotfiles }}/.gitconfig"
+    dest: "{{ path_home }}/.gitconfig"
+    owner: "{{ ansible_facts.user_id }}"
+    mode: '0644'
+    remote_src: true
+
+- name: Configure git user name
+  community.general.git_config:
+    name: user.name
+    scope: global
+    value: "{{ git_user_name }}"
+
+- name: Configure git user email
+  community.general.git_config:
+    name: user.email
+    scope: global
+    value: "{{ git_user_email }}"

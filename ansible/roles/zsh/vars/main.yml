@@ -1,0 +1,5 @@
+name_zshrc: ".zshrc"
+name_p10k: ".p10k.zsh"
+path_zsh: "{{ path_dotfiles }}/zsh"
+path_zshrc: "{{ path_zsh }}/{{ name_zshrc }}"
+path_p10k: "{{ path_zsh }}/{{ name_p10k }}"

@@ -1,0 +1,19 @@
+- name: Install Docker
+  become: true
+  shell: curl -fsSL https://get.docker.com | sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Enable and start Docker
+  become: true
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Log in to Docker Hub
+  community.docker.docker_login:
+    registry_url: https://index.docker.io/v1/
+    username: "{{ dockerhub_username }}"
+    password: "{{ dockerhub_token }}"
+  when: dockerhub_username | default('') | length > 0 and dockerhub_token | default('') | length > 0

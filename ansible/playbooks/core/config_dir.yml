@@ -1,8 +1,0 @@
-- name: Ensure config directory exists
-  hosts: all
-  tasks:
-    - name: Ensure .config directory exists
-      file:
-        path: "{{ path_config }}"
-        state: directory
-        mode: '0755'

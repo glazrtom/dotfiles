@@ -1,0 +1,148 @@
+#################################################################
+# macOS INSTALLATIONS (Homebrew)
+#################################################################
+
+- name: Install kubectl on macOS
+  community.general.homebrew:
+    name: kubectl
+    state: present
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: Install helm on macOS
+  community.general.homebrew:
+    name: helm
+    state: present
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: Install krew on macOS via Homebrew
+  community.general.homebrew:
+    name: krew
+    state: present
+  when: ansible_facts['os_family'] == "Darwin"
+
+#################################################################
+# Linux: kubectl (Debian/Ubuntu via pkgs.k8s.io)
+#################################################################
+
+- name: Install kubectl on Debian/Ubuntu
+  become: true
+  block:
+    - name: Ensure apt keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Kubernetes apt signing key
+      ansible.builtin.get_url:
+        url: "https://pkgs.k8s.io/core:/stable:/{{ kubectl_channel }}/deb/Release.key"
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: '0644'
+
+    - name: Add Kubernetes apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/{{ kubectl_channel }}/deb/ /"
+        filename: kubernetes
+        state: present
+
+    - name: Install kubectl
+      ansible.builtin.apt:
+        name: kubectl
+        state: present
+        update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install kubectl on RHEL/CentOS/AlmaLinux/Rocky
+  become: true
+  block:
+    - name: Add Kubernetes YUM repository
+      ansible.builtin.yum_repository:
+        name: kubernetes
+        description: Kubernetes Repo
+        baseurl: "https://pkgs.k8s.io/core:/stable:/{{ kubectl_channel }}/rpm/"
+        gpgkey: "https://pkgs.k8s.io/core:/stable:/{{ kubectl_channel }}/rpm/repodata/repomd.xml.key"
+        enabled: yes
+        gpgcheck: yes
+
+    - name: Install kubectl
+      ansible.builtin.yum:
+        name: kubectl
+        state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install kubectl on Arch Linux
+  become: true
+  community.general.pacman:
+    name: kubectl
+    state: present
+  when: ansible_facts['os_family'] == "Archlinux"
+
+# Fallback
+- name: Install kubectl via direct download (fallback)
+  become: true
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/v{{ kubectl_version }}/bin/{{ ansible_facts.system | lower }}/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  when: ansible_facts['os_family'] not in ["Debian", "RedHat", "Archlinux", "Darwin"]
+
+#################################################################
+# Linux: HELM
+#################################################################
+
+- name: Download Helm installer
+  become: true
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0755'
+  when: ansible_facts['os_family'] != "Darwin"
+
+- name: Install Helm on Linux
+  become: true
+  ansible.builtin.command: /tmp/get_helm.sh
+  args:
+    creates: /usr/local/bin/helm
+  when: ansible_facts['os_family'] != "Darwin"
+
+#################################################################
+# Linux: Krew
+#################################################################
+
+- name: Ensure krew directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.krew/bin"
+    state: directory
+    mode: "0755"
+  when: ansible_facts['os_family'] != "Darwin"
+
+- name: Install Krew on Linux
+  ansible.builtin.shell: |
+    set -e
+    cd "$(mktemp -d)"
+    OS="$(uname | tr '[:upper:]' '[:lower:]')"
+    ARCH="$(uname -m)"
+    if [ "$ARCH" = "x86_64" ]; then ARCH=amd64; fi
+    if [ "$ARCH" = "arm64" ]; then ARCH=arm64; fi
+    KREW="krew-${OS}_${ARCH}"
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz"
+    tar zxvf "${KREW}.tar.gz"
+    ./"${KREW}" install krew
+  args:
+    executable: /bin/bash
+    creates: "{{ ansible_facts.env.HOME }}/.krew/bin/kubectl-krew"
+  environment:
+    PATH: "{{ ansible_facts.env.HOME }}/.krew/bin:{{ ansible_facts.env.PATH }}"
+  when: ansible_facts['os_family'] != "Darwin"
+
+#################################################################
+# Install kubectl-netshoot plugin via Krew
+#################################################################
+
+- name: Install kubectl-netshoot plugin
+  ansible.builtin.command: kubectl krew install netshoot
+  args:
+    creates: "{{ ansible_facts.env.HOME }}/.krew/bin/kubectl-netshoot"
+  environment:
+    PATH: "{{ ansible_facts.env.HOME }}/.krew/bin:{{ ansible_facts.env.PATH }}"
+  when: ansible_facts['os_family'] != "Darwin"

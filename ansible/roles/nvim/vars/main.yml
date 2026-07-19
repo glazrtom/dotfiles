@@ -1,0 +1,1 @@
+path_autoload: "{{ path_local }}/share/nvim/site/autoload"

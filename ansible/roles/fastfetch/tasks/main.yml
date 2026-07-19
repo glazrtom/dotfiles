@@ -1,0 +1,23 @@
+- name: Add Fastfetch PPA (Ubuntu 22.04–24.10)
+  become: true
+  block:
+    - name: Add Fastfetch PPA
+      apt_repository:
+        repo: ppa:zhangsongcui3371/fastfetch
+        state: present
+      register: fastfetch_ppa
+
+    - name: Update apt cache after adding PPA
+      apt:
+        update_cache: yes
+      when: fastfetch_ppa.changed
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - ansible_facts.distribution_version is version("22.04", ">=")
+    - ansible_facts.distribution_version is version("24.10", "<")
+
+- name: Install Fastfetch via package manager
+  become: true
+  package:
+    name: fastfetch
+    state: present

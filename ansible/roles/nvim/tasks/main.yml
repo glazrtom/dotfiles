@@ -1,0 +1,69 @@
+- name: Install Neovim
+  become: true
+  package:
+    name: neovim
+    state: present
+
+- name: Link neovim config
+  file:
+    src: "{{ path_dotfiles }}/nvim"
+    dest: "{{ path_config }}/nvim"
+    state: link
+    force: yes
+
+- name: Ensure autoload directory exists
+  file:
+    path: "{{ path_autoload }}"
+    state: directory
+    mode: '0755'
+
+- name: Install vim-plug
+  get_url:
+    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    dest: "{{ path_autoload }}/plug.vim"
+    mode: '0644'
+
+- name: For Debian based
+  when: ansible_facts.os_family == 'Debian'
+  become: true
+  block:
+    - name: Install Node.js and npm (Debian-based)
+      apt:
+        name:
+          - nodejs
+          - npm
+        state: present
+
+    - name: Install python3-pip (Debian-based)
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install python3-pynvim (Debian-based)
+      apt:
+        name: python3-pynvim
+        state: present
+
+    - name: Install ueberzug (Debian-based)
+      apt:
+        name: ueberzug
+        state: present
+
+    - name: Install python3-venv (Debian-based)
+      apt:
+        name: python3-venv
+        state: present
+
+      # TODO this may be also for other systems
+    - name: Install treesitter-cli (Debian-based)
+      apt:
+        name: tree-sitter-cli
+        state: present
+
+- name: Install pynvim and ueberzug with pip (non-Debian)
+  pip:
+    name:
+      - pynvim
+      - ueberzug
+    executable: pip3
+  when: ansible_facts.os_family != 'Debian'

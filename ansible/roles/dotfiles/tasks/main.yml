@@ -1,0 +1,85 @@
+- name: Ensure git is installed
+  become: true
+  package:
+    name: git
+    state: present
+
+# ---------------------------------------------------------------------------
+# SSH mode: clone everything, incl. private submodules. Bootstrap a key first.
+# ---------------------------------------------------------------------------
+- name: SSH transport
+  when: dotfiles_transport == "ssh"
+  block:
+    - name: Check GitHub SSH authentication
+      ansible.builtin.command: ssh -o StrictHostKeyChecking=accept-new -T git@github.com
+      register: gh_ssh
+      failed_when: false
+      changed_when: false
+
+    - name: Bootstrap SSH key when not yet authenticated
+      when: "'successfully authenticated' not in gh_ssh.stderr"
+      block:
+        - name: Generate an SSH key if none exists
+          ansible.builtin.command:
+            cmd: >-
+              ssh-keygen -t ed25519 -N "" -f "{{ ssh_key_path }}"
+              -C "{{ ansible_facts.user_id }}@{{ ansible_facts.hostname }}"
+            creates: "{{ ssh_key_path }}"
+
+        - name: Read the public key
+          ansible.builtin.slurp:
+            src: "{{ ssh_key_path }}.pub"
+          register: ssh_pubkey
+
+        - name: Wait until the key is added to GitHub
+          ansible.builtin.pause:
+            prompt: |-
+
+              Add this public key to GitHub → https://github.com/settings/keys
+
+              {{ ssh_pubkey.content | b64decode | trim }}
+
+              Press ENTER once it is added to continue...
+
+        - name: Verify GitHub SSH authentication now works
+          ansible.builtin.command: ssh -o StrictHostKeyChecking=accept-new -T git@github.com
+          register: gh_ssh_recheck
+          changed_when: false
+          failed_when: "'successfully authenticated' not in gh_ssh_recheck.stderr"
+
+    - name: Clone dotfiles with all submodules (SSH)
+      ansible.builtin.git:
+        repo: "{{ repo_dotfiles_ssh }}"
+        dest: "{{ path_dotfiles }}"
+        version: master
+        accept_hostkey: yes
+        recursive: yes
+
+# ---------------------------------------------------------------------------
+# HTTPS mode: clone over HTTPS, init only the public submodules we can reach.
+# ---------------------------------------------------------------------------
+- name: HTTPS transport
+  when: dotfiles_transport == "https"
+  block:
+    - name: Clone dotfiles without submodules (HTTPS)
+      ansible.builtin.git:
+        repo: "{{ repo_dotfiles_https }}"
+        dest: "{{ path_dotfiles }}"
+        version: master
+        recursive: no
+
+    # `git -c url.insteadOf` forces HTTPS so public submodules pinned to
+    # git@github.com URLs (e.g. zsh-history-substring-search) also clone.
+    - name: Initialise public submodules (HTTPS, no SSH key needed)
+      ansible.builtin.command:
+        cmd: >-
+          git -c url."https://github.com/".insteadOf="git@github.com:"
+          submodule update --init --recursive -- {{ item }}
+        chdir: "{{ path_dotfiles }}"
+        creates: "{{ path_dotfiles }}/{{ item }}/.git"
+      loop: "{{ dotfiles_submodules }}"
+
+- name: Fail on unknown transport
+  ansible.builtin.fail:
+    msg: "dotfiles_transport must be 'ssh' or 'https', got '{{ dotfiles_transport }}'"
+  when: dotfiles_transport not in ["ssh", "https"]

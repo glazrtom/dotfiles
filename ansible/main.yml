@@ -1,0 +1,10 @@
+# Core workstation bundle: updates the system, clones dotfiles, then sets up
+# zsh (+fastfetch), nvim (+config_dir), and ranger (+config_dir) via role deps.
+- name: Set up workstation
+  hosts: all
+  roles:
+    - system_update
+    - dotfiles
+    - zsh
+    - nvim
+    - ranger

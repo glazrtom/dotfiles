@@ -1,1 +1,4 @@
 kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+
+# Headless servers: no SSH key, clone dotfiles over HTTPS (public submodules only).
+dotfiles_transport: https

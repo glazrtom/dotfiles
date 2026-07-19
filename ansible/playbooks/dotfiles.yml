@@ -1,16 +1,5 @@
-- name: Clone dotfiles repository
+# Update the dotfiles repo from remote (also pulls latest on re-run).
+- name: Update dotfiles
   hosts: all
-  vars:
-    repo_dotfiles: "git@github.com:glazrtom/dotfiles.git"
-  tasks:
-    - name: Ensure git is installed
-      become: true
-      package:
-        name: git
-        state: present
-    - name: Clone dotfiles repository
-      git:
-        repo: "{{ repo_dotfiles }}"
-        dest: "{{ path_dotfiles }}"
-        version: master
-        accept_hostkey: yes
+  roles:
+    - dotfiles

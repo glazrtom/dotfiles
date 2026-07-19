@@ -1,0 +1,5 @@
+# Full system package upgrade (apt / pacman / dnf / homebrew).
+- name: Update system packages
+  hosts: all
+  roles:
+    - system_update

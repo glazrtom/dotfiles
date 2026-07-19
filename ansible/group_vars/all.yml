@@ -1,4 +1,4 @@
-path_home: "{{ ansible_env.HOME }}"
+path_home: "{{ ansible_facts.env.HOME }}"
 path_config: "{{ path_home }}/.config"
 path_local: "{{ path_home }}/.local"
 path_dotfiles: "{{ path_home }}/dotfiles"

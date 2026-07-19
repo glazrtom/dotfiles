@@ -1,0 +1,30 @@
+- name: Install ZSH and dependencies
+  become: true
+  package:
+    name:
+      - zsh
+      - zsh-syntax-highlighting
+      - zsh-autosuggestions
+      - eza
+      - autojump
+    state: present
+
+- name: Link .zshrc file
+  file:
+    src: "{{ path_zshrc }}"
+    dest: "{{ path_home }}/{{ name_zshrc }}"
+    state: link
+    force: yes
+
+- name: Link .p10k file
+  file:
+    src: "{{ path_p10k }}"
+    dest: "{{ path_home }}/{{ name_p10k }}"
+    state: link
+    force: yes
+
+- name: Change default shell to zsh
+  become: true
+  user:
+    name: "{{ ansible_facts.user_id }}"
+    shell: /usr/bin/zsh

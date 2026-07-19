@@ -1,0 +1,2 @@
+# Personal workstation(s): clone everything over SSH (incl. private submodules).
+dotfiles_transport: ssh

@@ -1,21 +1,4 @@
-- import_playbook: core/config_dir.yml
-
 - name: Setup ranger
   hosts: all
-  vars:
-      path_config_ranger: "{{ path_config }}/ranger"
-  tasks:
-    - name: Install ranger
-      become: true
-      package:
-        name:
-        - ranger
-        - trash-cli
-        state: present
-
-    - name: Link ranger config
-      file:
-        src: "{{ path_dotfiles }}/ranger"
-        dest: "{{ path_config_ranger }}"
-        state: link
-        force: yes
+  roles:
+    - ranger

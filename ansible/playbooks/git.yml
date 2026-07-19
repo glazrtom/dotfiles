@@ -7,23 +7,5 @@
     - name: git_user_email
       prompt: "Enter your Git user email"
       private: no
-  tasks:
-    - name: Ensure git is installed
-      become: true
-      package:
-        name: git
-        state: present
-
-    - name: Copy git config
-      copy:
-        src: "{{ path_dotfiles }}/.gitconfig"
-        dest: "{{ path_home }}/.gitconfig"
-        owner: "{{ ansible_user }}"
-        mode: '0644'
-        remote_src: true
-
-    - name: Configure git user name
-      command: git config --global user.name "{{ git_user_name }}"
-
-    - name: Configure git user email
-      command: git config --global user.email "{{ git_user_email }}"
+  roles:
+    - git
