@@ -7,14 +7,14 @@
     update_cache: yes
     upgrade: dist
     autoremove: yes
-  when: ansible_facts['os_family'] == "Debian"
+  when: os_debian
 
 - name: Update and upgrade all pacman packages (Arch)
   become: true
   community.general.pacman:
     update_cache: yes
     upgrade: yes
-  when: ansible_facts['os_family'] == "Archlinux"
+  when: os_archlinux
 
 - name: Update and upgrade all dnf packages (RHEL/Fedora)
   become: true
@@ -22,10 +22,10 @@
     name: "*"
     state: latest
     update_cache: yes
-  when: ansible_facts['os_family'] == "RedHat"
+  when: os_redhat
 
 - name: Update Homebrew and upgrade all packages (macOS)
   community.general.homebrew:
     update_homebrew: yes
     upgrade_all: yes
-  when: ansible_facts['os_family'] == "Darwin"
+  when: os_macos

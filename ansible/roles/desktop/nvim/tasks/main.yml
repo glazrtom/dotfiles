@@ -24,7 +24,7 @@
     mode: '0644'
 
 - name: For Debian based
-  when: ansible_facts.os_family == 'Debian'
+  when: os_debian
   become: true
   block:
     - name: Install Node.js and npm (Debian-based)
@@ -66,4 +66,4 @@
       - pynvim
       - ueberzug
     executable: pip3
-  when: ansible_facts.os_family != 'Debian'
+  when: not os_debian

@@ -6,19 +6,19 @@
   community.general.homebrew:
     name: kubectl
     state: present
-  when: ansible_facts['os_family'] == "Darwin"
+  when: os_macos
 
 - name: Install helm on macOS
   community.general.homebrew:
     name: helm
     state: present
-  when: ansible_facts['os_family'] == "Darwin"
+  when: os_macos
 
 - name: Install krew on macOS via Homebrew
   community.general.homebrew:
     name: krew
     state: present
-  when: ansible_facts['os_family'] == "Darwin"
+  when: os_macos
 
 #################################################################
 # Linux: kubectl (Debian/Ubuntu via pkgs.k8s.io)
@@ -50,7 +50,7 @@
         name: kubectl
         state: present
         update_cache: yes
-  when: ansible_facts['os_family'] == "Debian"
+  when: os_debian
 
 - name: Install kubectl on RHEL/CentOS/AlmaLinux/Rocky
   become: true
@@ -68,14 +68,14 @@
       ansible.builtin.yum:
         name: kubectl
         state: present
-  when: ansible_facts['os_family'] == "RedHat"
+  when: os_redhat
 
 - name: Install kubectl on Arch Linux
   become: true
   community.general.pacman:
     name: kubectl
     state: present
-  when: ansible_facts['os_family'] == "Archlinux"
+  when: os_archlinux
 
 # Fallback
 - name: Install kubectl via direct download (fallback)
@@ -84,7 +84,7 @@
     url: "https://dl.k8s.io/release/v{{ kubectl_version }}/bin/{{ ansible_facts.system | lower }}/amd64/kubectl"
     dest: /usr/local/bin/kubectl
     mode: '0755'
-  when: ansible_facts['os_family'] not in ["Debian", "RedHat", "Archlinux", "Darwin"]
+  when: not (os_debian or os_redhat or os_archlinux or os_macos)
 
 #################################################################
 # Linux: HELM
@@ -96,14 +96,14 @@
     url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
     dest: /tmp/get_helm.sh
     mode: '0755'
-  when: ansible_facts['os_family'] != "Darwin"
+  when: os_linux
 
 - name: Install Helm on Linux
   become: true
   ansible.builtin.command: /tmp/get_helm.sh
   args:
     creates: /usr/local/bin/helm
-  when: ansible_facts['os_family'] != "Darwin"
+  when: os_linux
 
 #################################################################
 # Linux: Krew
@@ -114,7 +114,7 @@
     path: "{{ ansible_facts.env.HOME }}/.krew/bin"
     state: directory
     mode: "0755"
-  when: ansible_facts['os_family'] != "Darwin"
+  when: os_linux
 
 - name: Install Krew on Linux
   ansible.builtin.shell: |
@@ -133,7 +133,7 @@
     creates: "{{ ansible_facts.env.HOME }}/.krew/bin/kubectl-krew"
   environment:
     PATH: "{{ ansible_facts.env.HOME }}/.krew/bin:{{ ansible_facts.env.PATH }}"
-  when: ansible_facts['os_family'] != "Darwin"
+  when: os_linux
 
 #################################################################
 # Install kubectl-netshoot plugin via Krew
@@ -145,4 +145,4 @@
     creates: "{{ ansible_facts.env.HOME }}/.krew/bin/kubectl-netshoot"
   environment:
     PATH: "{{ ansible_facts.env.HOME }}/.krew/bin:{{ ansible_facts.env.PATH }}"
-  when: ansible_facts['os_family'] != "Darwin"
+  when: os_linux
