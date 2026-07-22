@@ -9,18 +9,20 @@ Personal cross-platform dotfiles for macOS and Arch/Debian Linux. Config directo
 ## Deployment
 
 ### Ansible (`ansible/`) — preferred
-One playbook per tool, symlinking `~/dotfiles/<tool>` into `~` or `~/.config` (`file: state=link force=yes`) after installing the relevant package. Path variables (`path_home`, `path_config`, `path_local`, `path_dotfiles`) come from `group_vars/all.yml` — reuse them rather than hardcoding paths.
+Roles + thin orchestration playbooks, split into two parallel trees: **desktop** (workstation configs) and **server** (homelab provisioning). Each tool is a role that installs its package then symlinks `~/dotfiles/<tool>` into `~` or `~/.config` (`file: state=link force=yes`). Path variables (`path_home`, `path_config`, `path_local`, `path_dotfiles`) come from `group_vars/all.yml` — reuse them rather than hardcoding paths. `ansible.cfg` sets `roles_path = roles/desktop:roles/server` (so role names resolve from either subtree) and the default inventory, so `-i` is not needed.
 
 ```
 cd ~/dotfiles/ansible
-ansible-playbook -i inventory.ini playbooks/bundle/base.yml -l local -K
+ansible-galaxy collection install -r requirements.yml   # first time / fresh host
+ansible-playbook playbooks/desktop/init.yml -l local -K
 ```
 
-- `playbooks/bundle/base.yml` — core bundle: imports `dotfiles.yml` (clones the repo to `~/dotfiles`) → `zsh.yml` → `nvim.yml` → `ranger.yml`.
-- `playbooks/core/config_dir.yml` — shared helper ensuring `~/.config` exists.
-- `playbooks/server/` — homelab (`orangePi`) provisioning: `k3s.yml` (k3s, MetalLB, ArgoCD, cloudflared, SealedSecrets), `k3s_apps.yml`, `server/init/init.yml` (first-boot user/hostname setup, own inventory). Several server playbooks use `vars_prompt` for secrets.
-- Hosts: `inventory.ini` has `[server]` (orangePi) and `[local]` (localhost) groups.
-- **Add a new tool**: create `ansible/playbooks/<tool>.yml` following the install-then-symlink pattern and wire it into `bundle/base.yml`.
+- **Layout**: `roles/desktop/*` + `roles/server/*` hold task logic; `playbooks/desktop/*` + `playbooks/server/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. desktop `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`; server `k3s`→`k3s_python`, `k3s_apps`→`k3s_python`+`homelab`). Tunables live in each role's `defaults/main.yml`.
+- `playbooks/desktop/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/desktop/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only.
+- `playbooks/server/main.yml` — full homelab provisioning: `import_playbook` chain of `init` (hostname + `server` user/group 1001:1001, login user joins group) → `k3s` (k3s, MetalLB, ArgoCD, cloudflared, SealedSecrets) → `k3s_apps` (apply ArgoCD manifests from the `tomato4/homelab` repo) → `kubeconfig` (fetch to `~/.kube/config`). `storage.yml` and `vpn_secret.yml` are situational, run on demand. Provisions as the existing `glazrtom` user (no separate bootstrap inventory).
+- **Transport for dotfiles**: `dotfiles_transport` (group_vars) is `ssh` for `[local]` (clones everything incl. private submodules, bootstraps an SSH key) and `https` for `[server]` (public submodules only).
+- Hosts: single `inventory.ini` with `[server]` (orangePi, user `glazrtom`) and `[local]` (localhost) groups.
+- **Add a new tool**: create `roles/desktop/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/desktop/init.yml` or give it a thin `playbooks/desktop/<tool>.yml`.
 
 ### Bash installer (`setup/`) — legacy, still used for granular/interactive scripts
 Entry point `setup/setup.sh`, exposed as the `setup` zsh function (tab-completes over `setup/scripts/`):

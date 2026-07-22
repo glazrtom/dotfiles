@@ -1,35 +1,9 @@
-- name: Apply all ArgoCD application yamls from repo
+- name: Apply ArgoCD application manifests from the homelab repo
   hosts: server
-  vars:
-    repo_url: "https://github.com/tomato4/homelab.git"
-    repo_dest: "{{ path_home }}/homelab"
-    applications_dir: "{{ repo_dest }}/applications"
   vars_prompt:
     - name: app_name
       prompt: "Enter name of ArgoCD application to deploy (leave * for all)"
       private: no
       default: "*"
-  tasks:
-    - name: Clone or update homelab repo
-      git:
-        repo: "{{ repo_url }}"
-        dest: "{{ repo_dest }}"
-        version: master
-        update: yes
-
-    - name: Find all ArgoCD application YAML files
-      find:
-        paths: "{{ applications_dir }}"
-        patterns: '{{ app_name }}.yaml,{{ app_name }}.yml'
-        recurse: yes
-      register: app_yamls
-
-    - name: Apply all ArgoCD application yamls
-      become: true
-      k8s:
-        state: present
-        src: "{{ item.path }}"
-        kubeconfig: "{{ kubeconfig_path }}"
-      loop: "{{ app_yamls.files }}"
-      loop_control:
-        label: "{{ item.path }}"
+  roles:
+    - k3s_apps
