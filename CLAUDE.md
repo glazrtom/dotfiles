@@ -9,20 +9,20 @@ Personal cross-platform dotfiles for macOS and Arch/Debian Linux. Config directo
 ## Deployment
 
 ### Ansible (`ansible/`) — preferred
-Roles + thin orchestration playbooks, split into two parallel trees: **desktop** (workstation configs) and **server** (homelab provisioning). Each tool is a role that installs its package then symlinks `~/dotfiles/<tool>` into `~` or `~/.config` (`file: state=link force=yes`). Path variables (`path_home`, `path_config`, `path_local`, `path_dotfiles`) come from `group_vars/all.yml` — reuse them rather than hardcoding paths. `ansible.cfg` sets `roles_path = roles/desktop:roles/server` (so role names resolve from either subtree) and the default inventory, so `-i` is not needed.
+Flat roles + thin orchestration playbooks for **desktop workstation configs only**. Each tool is a role that installs its package then symlinks `~/dotfiles/<tool>` into `~` or `~/.config` (`file: state=link force=yes`). Path variables (`path_home`, `path_config`, `path_local`, `path_dotfiles`) come from `group_vars/all.yml` — reuse them rather than hardcoding paths. `ansible.cfg` sets `roles_path = roles` and the default inventory, so `-i` is not needed.
 
 ```
 cd ~/dotfiles/ansible
 ansible-galaxy collection install -r requirements.yml   # first time / fresh host
-ansible-playbook playbooks/desktop/init.yml -l local -K
+ansible-playbook playbooks/init.yml -K
 ```
 
-- **Layout**: `roles/desktop/*` + `roles/server/*` hold task logic; `playbooks/desktop/*` + `playbooks/server/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. desktop `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`; server `k3s`→`k3s_python`, `k3s_apps`→`k3s_python`+`homelab`). Tunables live in each role's `defaults/main.yml`.
-- `playbooks/desktop/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/desktop/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only.
-- `playbooks/server/main.yml` — full homelab provisioning: `import_playbook` chain of `init` (hostname + `server` user/group 1001:1001, login user joins group) → `k3s` (k3s, MetalLB, ArgoCD, cloudflared, SealedSecrets) → `k3s_apps` (apply ArgoCD manifests from the `tomato4/homelab` repo) → `kubeconfig` (fetch to `~/.kube/config`). `storage.yml` and `vpn_secret.yml` are situational, run on demand. Provisions as the existing `glazrtom` user (no separate bootstrap inventory).
-- **Transport for dotfiles**: `dotfiles_transport` (group_vars) is `ssh` for `[local]` (clones everything incl. private submodules, bootstraps an SSH key) and `https` for `[server]` (public submodules only).
-- Hosts: single `inventory.ini` with `[server]` (orangePi, user `glazrtom`) and `[local]` (localhost) groups.
-- **Add a new tool**: create `roles/desktop/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/desktop/init.yml` or give it a thin `playbooks/desktop/<tool>.yml`.
+- **Layout**: `roles/*` hold task logic; `playbooks/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`). Tunables live in each role's `defaults/main.yml`.
+- `playbooks/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only.
+- **Transport for dotfiles**: `dotfiles_transport` (`group_vars/all.yml`) is `ssh` — clones everything incl. private submodules, bootstraps an SSH key.
+- Hosts: single `inventory.ini` with just `[local]` (localhost).
+- **Add a new tool**: create `roles/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/init.yml` or give it a thin `playbooks/<tool>.yml`.
+- **Server/homelab provisioning** (k3s, MetalLB, ArgoCD, etc.) moved to the `homelab` repo — see `~/projects/homelab/ansible` (`playbooks/main.yml`).
 
 ### Bash installer (`setup/`) — legacy, still used for granular/interactive scripts
 Entry point `setup/setup.sh`, exposed as the `setup` zsh function (tab-completes over `setup/scripts/`):

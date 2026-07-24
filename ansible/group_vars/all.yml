@@ -8,3 +8,6 @@ os_debian: "{{ ansible_facts['os_family'] == 'Debian' }}"
 os_archlinux: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
 os_redhat: "{{ ansible_facts['os_family'] == 'RedHat' }}"
 os_linux: "{{ not os_macos }}"
+
+# Personal workstation(s): clone everything over SSH (incl. private submodules).
+dotfiles_transport: ssh
