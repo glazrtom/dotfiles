@@ -1,3 +1,36 @@
 {
-  "plansDirectory": ".claude/plans"
+  "plansDirectory": ".claude/plans",
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "codeload.github.com",
+        "raw.githubusercontent.com",
+        "objects.githubusercontent.com",
+        "galaxy.ansible.com",
+        "*.galaxy.ansible.com",
+        "pypi.org",
+        "files.pythonhosted.org"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/.ansible"
+      ],
+      "denyWrite": [
+        "~/.ssh"
+      ]
+    },
+    "excludedCommands": [
+      "docker *",
+      "git fetch *",
+      "git pull *",
+      "git submodule *"
+    ]
+  },
+  "permissions": {
+    "ask": ["Bash(dangerouslyDisableSandbox:true)"]
+  }
 }

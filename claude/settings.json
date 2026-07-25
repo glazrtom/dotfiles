@@ -19,8 +19,7 @@
         "~/.gnupg",
         "~/.aws",
         "~/.config/gcloud",
-        "~/.claude",
-        "~/dotfiles"
+        "~/.claude"
       ]
     }
   },
