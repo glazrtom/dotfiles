@@ -23,6 +23,7 @@ ansible-playbook playbooks/init.yml -K
 - Hosts: single `inventory.ini` with just `[local]` (localhost).
 - **Add a new tool**: create `roles/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/init.yml` or give it a thin `playbooks/<tool>.yml`.
 - **Server/homelab provisioning** (k3s, MetalLB, ArgoCD, etc.) moved to the `homelab` repo — see `~/projects/homelab/ansible` (`playbooks/main.yml`).
+- **`playbooks/claude.yml`** installs Claude Code, ccstatusline, and `cpm` (claude-profile-manager), then symlinks `claude/settings.json` → `~/.claude/settings.json` and `claude/ccstatusline/settings.json` → `~/.config/ccstatusline/settings.json`. `~/.claude` must stay a real directory (Claude writes ~100M+ of transcripts/cache/credentials into it) — only individual files are linked into it, never the directory itself. Only these two config files are tracked; everything else under `~/.claude` (history, credentials, daemon state, plugin cache, projects) is machine state and stays untracked.
 
 ### Bash installer (`setup/`) — legacy, still used for granular/interactive scripts
 Entry point `setup/setup.sh`, exposed as the `setup` zsh function (tab-completes over `setup/scripts/`):

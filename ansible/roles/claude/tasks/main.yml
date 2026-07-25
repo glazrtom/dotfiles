@@ -1,0 +1,76 @@
+- name: Install Node.js/npm on macOS
+  community.general.homebrew:
+    name: node
+    state: present
+  when: os_macos
+
+- name: Install Node.js/npm on Linux
+  become: true
+  package:
+    name:
+      - nodejs
+      - npm
+    state: present
+  when: os_linux
+
+- name: Install Claude Code
+  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    creates: "{{ path_local_bin }}/claude"
+
+- name: Ensure ~/.claude directory exists
+  file:
+    path: "{{ path_claude_home }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure ccstatusline config directory exists
+  file:
+    path: "{{ path_config_ccstatusline }}"
+    state: directory
+    mode: '0755'
+
+- name: Link Claude Code settings.json
+  file:
+    src: "{{ path_claude_dotfiles }}/settings.json"
+    dest: "{{ path_claude_home }}/settings.json"
+    state: link
+    force: yes
+
+- name: Link ccstatusline settings.json
+  file:
+    src: "{{ path_claude_dotfiles }}/ccstatusline/settings.json"
+    dest: "{{ path_config_ccstatusline }}/settings.json"
+    state: link
+    force: yes
+
+- name: Install ccstatusline (configurator)
+  become: "{{ os_linux }}"
+  community.general.npm:
+    name: ccstatusline
+    global: true
+    state: latest
+
+- name: Ensure ~/.local/bin directory exists
+  file:
+    path: "{{ path_local_bin }}"
+    state: directory
+    mode: '0755'
+
+- name: Add cpm (claude-profile-manager) homebrew tap
+  community.general.homebrew_tap:
+    name: jakubkontra/tap
+  when: os_macos
+
+- name: Install cpm (claude-profile-manager) on macOS
+  community.general.homebrew:
+    name: cpm
+    state: present
+  when: os_macos
+
+- name: Install cpm (claude-profile-manager) on Linux
+  ansible.builtin.get_url:
+    url: "{{ cpm_version_url_base }}/cpm_linux_{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
+    dest: "{{ path_local_bin }}/cpm"
+    mode: '0755'
+  when: os_linux

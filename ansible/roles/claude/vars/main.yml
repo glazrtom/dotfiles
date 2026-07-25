@@ -1,0 +1,5 @@
+path_claude_dotfiles: "{{ path_dotfiles }}/claude"
+path_claude_home: "{{ path_home }}/.claude"
+path_config_ccstatusline: "{{ path_config }}/ccstatusline"
+path_local_bin: "{{ path_local }}/bin"
+cpm_version_url_base: "https://github.com/jakubkontra/claude-profile-manager/releases/latest/download"

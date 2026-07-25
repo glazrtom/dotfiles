@@ -1,0 +1,4 @@
+- name: Setup Claude Code
+  hosts: all
+  roles:
+    - claude

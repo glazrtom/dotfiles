@@ -1,0 +1,82 @@
+{
+  "sandbox": {
+    "credentials": {
+      "files": [
+        { "path": "~/.ssh", "mode": "deny" },
+        { "path": "~/.aws", "mode": "deny" },
+        { "path": "~/.gnupg", "mode": "deny" },
+        { "path": "~/.config/gcloud", "mode": "deny" },
+        { "path": "~/.netrc", "mode": "deny" },
+        { "path": "~/.docker/config.json", "mode": "deny" },
+        { "path": "~/.m2/settings.xml", "mode": "deny" },
+        { "path": "~/Library/Keychains", "mode": "deny" },
+        { "path": "~/.claude/.credentials.json", "mode": "deny" }
+      ]
+    },
+    "filesystem": {
+      "denyWrite": [
+        "~/.ssh",
+        "~/.gnupg",
+        "~/.aws",
+        "~/.config/gcloud",
+        "~/.claude",
+        "~/dotfiles"
+      ]
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(kt|kts\\)$\")",
+      "Bash(ls -la /Users/tom/work/skeleton/core/*/build.gradle.kts)"
+    ],
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.netrc)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.m2/settings.xml)",
+      "Read(~/Library/Keychains/**)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.claude/history.jsonl)",
+
+      "Bash(sudo *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf $HOME*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)"
+    ],
+    "defaultMode": "plan",
+    "disableAutoMode": "disable"
+  },
+  "model": "opusplan",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs your attention\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "medium",
+  "tui": "fullscreen",
+  "verbose": true
+}
