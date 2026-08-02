@@ -1,28 +1,4 @@
 {
-  "sandbox": {
-    "credentials": {
-      "files": [
-        { "path": "~/.ssh", "mode": "deny" },
-        { "path": "~/.aws", "mode": "deny" },
-        { "path": "~/.gnupg", "mode": "deny" },
-        { "path": "~/.config/gcloud", "mode": "deny" },
-        { "path": "~/.netrc", "mode": "deny" },
-        { "path": "~/.docker/config.json", "mode": "deny" },
-        { "path": "~/.m2/settings.xml", "mode": "deny" },
-        { "path": "~/Library/Keychains", "mode": "deny" },
-        { "path": "~/.claude/.credentials.json", "mode": "deny" }
-      ]
-    },
-    "filesystem": {
-      "denyWrite": [
-        "~/.ssh",
-        "~/.gnupg",
-        "~/.aws",
-        "~/.config/gcloud",
-        "~/.claude"
-      ]
-    }
-  },
   "permissions": {
     "allow": [
       "Bash(grep -E \"\\\\.\\(kt|kts\\)$\")",
@@ -39,7 +15,6 @@
       "Read(~/Library/Keychains/**)",
       "Read(~/.claude/.credentials.json)",
       "Read(~/.claude/history.jsonl)",
-
       "Bash(sudo *)",
       "Bash(rm -rf /)",
       "Bash(rm -rf /*)",
@@ -74,6 +49,57 @@
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true
+  },
+  "sandbox": {
+    "filesystem": {
+      "denyWrite": [
+        "~/.ssh",
+        "~/.gnupg",
+        "~/.aws",
+        "~/.config/gcloud",
+        "~/.claude"
+      ]
+    },
+    "credentials": {
+      "files": [
+        {
+          "path": "~/.ssh",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.aws",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.gnupg",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.config/gcloud",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.netrc",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.docker/config.json",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.m2/settings.xml",
+          "mode": "deny"
+        },
+        {
+          "path": "~/Library/Keychains",
+          "mode": "deny"
+        },
+        {
+          "path": "~/.claude/.credentials.json",
+          "mode": "deny"
+        }
+      ]
+    }
   },
   "effortLevel": "medium",
   "tui": "fullscreen",
