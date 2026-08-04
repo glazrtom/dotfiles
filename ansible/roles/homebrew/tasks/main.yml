@@ -1,0 +1,50 @@
+- name: Check for Xcode Command Line Tools
+  ansible.builtin.command: xcode-select -p
+  register: xcode_clt
+  failed_when: false
+  changed_when: false
+  when: os_macos
+
+- name: Install Xcode Command Line Tools
+  when: os_macos and xcode_clt.rc != 0
+  block:
+    - name: Trigger Xcode Command Line Tools install
+      ansible.builtin.command: xcode-select --install
+      changed_when: true
+
+    - name: Wait for Xcode Command Line Tools install to complete
+      ansible.builtin.pause:
+        prompt: |-
+
+          A "Install Command Line Tools" dialog should have opened.
+          Complete that installation, then press ENTER to continue...
+
+    - name: Verify Xcode Command Line Tools are now present
+      ansible.builtin.command: xcode-select -p
+      register: xcode_clt_recheck
+      changed_when: false
+      failed_when: xcode_clt_recheck.rc != 0
+
+- name: Ensure Homebrew prefix exists and is owned by the current user
+  become: true
+  ansible.builtin.file:
+    path: "{{ homebrew_prefix }}"
+    state: directory
+    owner: "{{ ansible_facts.user_id }}"
+    mode: '0755'
+  when: os_macos
+
+- name: Install Homebrew
+  ansible.builtin.shell: >-
+    /bin/bash -c
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/brew/HEAD/install.sh)"
+  args:
+    creates: "{{ homebrew_prefix }}/bin/brew"
+  environment:
+    NONINTERACTIVE: "1"
+  when: os_macos
+
+- name: Verify Homebrew is installed
+  ansible.builtin.command: "{{ homebrew_prefix }}/bin/brew --version"
+  changed_when: false
+  when: os_macos

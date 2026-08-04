@@ -66,6 +66,9 @@ bindkey "^[[1;9C" end-of-line       # cmd+→
 [ -f "$DOTFILES_ZSH/zsh_alias" ] && source "$DOTFILES_ZSH/zsh_alias"
 
 if [[ $IS_MAC -eq 0 ]]; then
+  for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    [ -x "$brew_bin" ] && eval "$("$brew_bin" shellenv)" && break
+  done
   ZSH_BASE="$(brew --prefix)/share"
 else
   ZSH_BASE="/usr/share"

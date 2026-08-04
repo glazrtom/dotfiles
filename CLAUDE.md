@@ -17,8 +17,8 @@ ansible-galaxy collection install -r requirements.yml   # first time / fresh hos
 ansible-playbook playbooks/init.yml -K
 ```
 
-- **Layout**: `roles/*` hold task logic; `playbooks/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`). Tunables live in each role's `defaults/main.yml`.
-- `playbooks/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only.
+- **Layout**: `roles/*` hold task logic; `playbooks/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`, `system_update`/`kubectl`/`claude`→`homebrew`). Tunables live in each role's `defaults/main.yml`.
+- `playbooks/init.yml` — core bundle: `homebrew` (macOS only, no-op on Linux) → `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only.
 - **Transport for dotfiles**: `dotfiles_transport` (`group_vars/all.yml`) is `ssh` — clones everything incl. private submodules, bootstraps an SSH key.
 - Hosts: single `inventory.ini` with just `[local]` (localhost).
 - **Add a new tool**: create `roles/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/init.yml` or give it a thin `playbooks/<tool>.yml`.
