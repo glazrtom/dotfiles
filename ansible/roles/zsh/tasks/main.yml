@@ -23,8 +23,23 @@
     state: link
     force: yes
 
-- name: Change default shell to zsh
+- name: Change default shell to zsh (Linux)
   become: true
   user:
     name: "{{ ansible_facts.user_id }}"
     shell: "{{ path_zsh_shell }}"
+  when:
+    - os_linux
+    - ansible_facts.user_shell != path_zsh_shell
+
+# The `user:` module's Darwin path also runs dseditgroup/_update_system_user(),
+# which prompts for credentials again on top of Ansible's -K. Setting the one
+# attribute directly avoids that. dscl also ignores /etc/shells, unlike chsh.
+- name: Change default shell to zsh (macOS)
+  become: true
+  ansible.builtin.command:
+    cmd: dscl . -create /Users/{{ ansible_facts.user_id }} UserShell {{ path_zsh_shell }}
+  when:
+    - os_macos
+    - ansible_facts.user_shell != path_zsh_shell
+  changed_when: true
