@@ -1,10 +1,9 @@
-# Core workstation bundle: bootstraps Homebrew (macOS), updates the system,
-# clones dotfiles, then sets up zsh (+fastfetch), nvim (+config_dir), and
-# ranger (+config_dir) via role deps.
+# Core workstation bundle: updates the system, clones dotfiles, then sets up
+# zsh (+fastfetch), nvim (+config_dir), and ranger (+config_dir) via role deps.
+# Homebrew itself is installed by ansible/bootstrap.sh, not by this playbook.
 - name: Set up workstation
   hosts: all
   roles:
-#    - homebrew TODO fix
     - system_update
     - dotfiles
     - zsh
