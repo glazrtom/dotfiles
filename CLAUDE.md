@@ -11,6 +11,8 @@ Personal cross-platform dotfiles for macOS and Arch/Debian Linux. Config directo
 ### Ansible (`ansible/`) — preferred
 Flat roles + thin orchestration playbooks for **desktop workstation configs only**. Each tool is a role that installs its package then symlinks `~/dotfiles/<tool>` into `~` or `~/.config` (`file: state=link force=yes`). Path variables (`path_home`, `path_config`, `path_local`, `path_dotfiles`) come from `group_vars/all.yml` — reuse them rather than hardcoding paths. `ansible.cfg` sets `roles_path = roles` and the default inventory, so `-i` is not needed.
 
+On a brand-new mac without the repo yet, `ansible/bootstrap.sh` is the curl-able entry point — it installs Homebrew + Ansible, bootstraps a GitHub SSH key (printing the pubkey and waiting for you to add it), clones `dotfiles` with submodules into `~/dotfiles`, then installs the collections below. The manual steps are only needed when the repo is already present:
+
 ```
 cd ~/dotfiles/ansible
 ansible-galaxy collection install -r requirements.yml   # first time / fresh host
