@@ -1,5 +1,5 @@
 - name: Install ranger
-  become: true
+  become: "{{ os_linux }}"
   package:
     name:
       - ranger

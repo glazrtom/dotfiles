@@ -1,8 +1,10 @@
-- name: Ensure git is installed
+# macOS gets git from the Xcode Command Line Tools (/usr/bin/git).
+- name: Ensure git is installed (Linux)
   become: true
   package:
     name: git
     state: present
+  when: os_linux
 
 # ---------------------------------------------------------------------------
 # SSH mode: clone everything, incl. private submodules. Bootstrap a key first.

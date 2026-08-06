@@ -1,5 +1,5 @@
 - name: Install ZSH and dependencies
-  become: true
+  become: "{{ os_linux }}"
   package:
     name:
       - zsh
@@ -27,4 +27,4 @@
   become: true
   user:
     name: "{{ ansible_facts.user_id }}"
-    shell: /usr/bin/zsh
+    shell: "{{ path_zsh_shell }}"

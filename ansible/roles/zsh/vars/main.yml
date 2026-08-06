@@ -3,3 +3,6 @@ name_p10k: ".p10k.zsh"
 path_zsh: "{{ path_dotfiles }}/zsh"
 path_zshrc: "{{ path_zsh }}/{{ name_zshrc }}"
 path_p10k: "{{ path_zsh }}/{{ name_p10k }}"
+# macOS: /bin/zsh is the system zsh and the only zsh in /etc/shells.
+# Brew's /opt/homebrew/bin/zsh is NOT in /etc/shells, so chsh would reject it.
+path_zsh_shell: "{{ '/bin/zsh' if os_macos else '/usr/bin/zsh' }}"

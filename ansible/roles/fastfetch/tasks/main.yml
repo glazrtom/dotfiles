@@ -17,7 +17,7 @@
     - ansible_facts.distribution_version is version("24.10", "<")
 
 - name: Install Fastfetch via package manager
-  become: true
+  become: "{{ os_linux }}"
   package:
     name: fastfetch
     state: present
