@@ -4,7 +4,7 @@
 - name: Set up workstation
   hosts: all
   roles:
-    - homebrew
+#    - homebrew TODO fix
     - system_update
     - dotfiles
     - zsh
