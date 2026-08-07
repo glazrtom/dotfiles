@@ -1,4 +1,0 @@
-- name: Install kubectl and related tools
-  hosts: all
-  roles:
-    - kubectl

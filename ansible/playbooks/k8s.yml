@@ -1,0 +1,6 @@
+# Kubernetes workstation toolkit: kubectl (+ helm, krew, netshoot) and k9s.
+- name: Install Kubernetes tooling
+  hosts: all
+  roles:
+    - kubectl
+    - k9s

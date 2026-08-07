@@ -1,0 +1,4 @@
+# No apt package for k9s; fetch the release tarball. Arch matches x86_64→amd64,
+# aarch64→arm64 the same way roles/claude does.
+k9s_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
+k9s_url: "https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_{{ k9s_arch }}.tar.gz"

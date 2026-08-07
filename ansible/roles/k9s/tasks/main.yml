@@ -1,0 +1,41 @@
+#################################################################
+# macOS INSTALLATION (Homebrew)
+#################################################################
+
+- name: Install k9s on macOS
+  community.general.homebrew:
+    name: k9s
+    state: present
+  when: os_macos
+
+#################################################################
+# Arch Linux INSTALLATION (pacman)
+#################################################################
+
+- name: Install k9s on Arch Linux
+  become: true
+  community.general.pacman:
+    name: k9s
+    state: present
+  when: os_archlinux
+
+#################################################################
+# Debian/Ubuntu + fallback: no apt package, fetch the release tarball
+#################################################################
+
+- name: Ensure ~/.local/bin exists
+  ansible.builtin.file:
+    path: "{{ path_local }}/bin"
+    state: directory
+    mode: '0755'
+  when: os_linux and not os_archlinux
+
+- name: Install k9s via direct download
+  ansible.builtin.unarchive:
+    src: "{{ k9s_url }}"
+    dest: "{{ path_local }}/bin"
+    remote_src: yes
+    include: [k9s]
+    mode: '0755'
+    creates: "{{ path_local }}/bin/k9s"
+  when: os_linux and not os_archlinux
