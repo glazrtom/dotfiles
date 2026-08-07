@@ -104,5 +104,7 @@
   "effortLevel": "medium",
   "tui": "fullscreen",
   "theme": "dark",
-  "verbose": true
+  "verbose": true,
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true
 }
