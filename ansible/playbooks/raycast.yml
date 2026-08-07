@@ -1,0 +1,4 @@
+- name: Setup Raycast
+  hosts: all
+  roles:
+    - raycast

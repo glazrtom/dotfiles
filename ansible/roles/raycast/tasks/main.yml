@@ -1,0 +1,13 @@
+#################################################################
+# Install Raycast (macOS only — no Linux build exists)
+#################################################################
+
+# Raycast's settings live in its own internal database and sync via a
+# Raycast account, not a file — so there's nothing here to symlink from
+# dotfiles/, unlike most other roles.
+
+- name: Install Raycast on macOS
+  community.general.homebrew_cask:
+    name: raycast
+    state: present
+  when: os_macos
