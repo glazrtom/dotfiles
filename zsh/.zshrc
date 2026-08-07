@@ -112,7 +112,7 @@ fi
 # source $DOTFILES/zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Created by `pipx` on 2025-09-06 21:03:10
-export PATH="$PATH:~/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 export PATH="$HOME/.mint/bin:$PATH"
 export PATH="$JAVA_HOME/bin:$PATH"
 

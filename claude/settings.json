@@ -103,5 +103,6 @@
   },
   "effortLevel": "medium",
   "tui": "fullscreen",
+  "theme": "dark",
   "verbose": true
 }
