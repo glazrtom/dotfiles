@@ -1,0 +1,30 @@
+#################################################################
+# macOS INSTALLATION (Homebrew)
+#################################################################
+
+- name: Install kubeseal on macOS
+  community.general.homebrew:
+    name: kubeseal
+    state: present
+  when: os_macos
+
+#################################################################
+# Linux: no distro package — fetch the pinned release tarball
+#################################################################
+
+- name: Ensure ~/.local/bin exists
+  ansible.builtin.file:
+    path: "{{ path_local }}/bin"
+    state: directory
+    mode: '0755'
+  when: os_linux
+
+- name: Install kubeseal via direct download
+  ansible.builtin.unarchive:
+    src: "{{ kubeseal_url }}"
+    dest: "{{ path_local }}/bin"
+    remote_src: yes
+    include: [kubeseal]
+    mode: '0755'
+    creates: "{{ path_local }}/bin/kubeseal"
+  when: os_linux

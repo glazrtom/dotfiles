@@ -1,0 +1,5 @@
+# Upstream has no `latest/download` alias — the version is part of the asset
+# filename — so it is pinned here. Arch mapping matches roles/k9s.
+kubeseal_version: "0.38.4"
+kubeseal_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
+kubeseal_url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ kubeseal_version }}/kubeseal-{{ kubeseal_version }}-linux-{{ kubeseal_arch }}.tar.gz"

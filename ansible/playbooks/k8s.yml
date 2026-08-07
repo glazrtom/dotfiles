@@ -4,3 +4,4 @@
   roles:
     - kubectl
     - k9s
+    - kubeseal
