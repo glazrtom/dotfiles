@@ -53,3 +53,6 @@
 [submodule "zsh/zsh-history-substring-search"]
 	path = zsh/zsh-history-substring-search
 	url = git@github.com:zsh-users/zsh-history-substring-search.git
+[submodule "wifi-loc-control/upstream"]
+	path = wifi-loc-control/upstream
+	url = https://github.com/vborodulin/wifi-loc-control.git

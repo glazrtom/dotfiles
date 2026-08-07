@@ -1,0 +1,66 @@
+# Switches the active macOS network location based on the current Wi-Fi SSID.
+# https://github.com/vborodulin/wifi-loc-control (vendored as a submodule).
+- name: Set up WiFiLocControl on macOS
+  when: os_macos
+  block:
+    - name: Check that the wifi-loc-control submodule is checked out
+      stat:
+        path: "{{ path_wifi_loc_dotfiles }}/upstream/wifi-loc-control.sh"
+      register: wifi_loc_script
+
+    - name: Fail if the submodule is missing
+      fail:
+        msg: "wifi-loc-control submodule not found. Run: git submodule update --init --recursive"
+      when: not wifi_loc_script.stat.exists
+
+    - name: Ensure ~/.local/bin directory exists
+      file: { path: "{{ path_local_bin }}", state: directory, mode: '0755' }
+
+    - name: Link wifi-loc-control.sh into ~/.local/bin
+      file:
+        src: "{{ path_wifi_loc_dotfiles }}/upstream/wifi-loc-control.sh"
+        dest: "{{ path_local_bin }}/wifi-loc-control.sh"
+        state: link
+        force: yes
+
+    - name: Ensure ~/.wifi-loc-control config directory exists
+      file: { path: "{{ path_wifi_loc_config }}", state: directory, mode: '0755' }
+
+    - name: Link alias.conf
+      file:
+        src: "{{ path_wifi_loc_dotfiles }}/alias.conf"
+        dest: "{{ path_wifi_loc_config }}/alias.conf"
+        state: link
+        force: yes
+
+    - name: List existing macOS network locations
+      command: networksetup -listlocations
+      register: wifi_loc_locations
+      changed_when: false
+
+    - name: Create the '{{ wifi_loc_location }}' network location
+      command: networksetup -createlocation "{{ wifi_loc_location }}" populate
+      when: wifi_loc_location not in wifi_loc_locations.stdout_lines
+
+    - name: Ensure ~/Library/LaunchAgents directory exists
+      file: { path: "{{ path_launch_agents }}", state: directory, mode: '0755' }
+
+    - name: Install WiFiLocControl launch agent
+      template:
+        src: WiFiLocControl.plist.j2
+        dest: "{{ path_launch_agents }}/WiFiLocControl.plist"
+        mode: '0644'
+      register: wifi_loc_plist
+
+    - name: Check whether the launch agent is loaded
+      command: launchctl list {{ wifi_loc_label }}
+      register: wifi_loc_agent
+      failed_when: false
+      changed_when: false
+
+    - name: Reload the launch agent
+      ansible.builtin.shell: >
+        launchctl unload "{{ path_launch_agents }}/WiFiLocControl.plist" >/dev/null 2>&1;
+        launchctl load -w "{{ path_launch_agents }}/WiFiLocControl.plist"
+      when: wifi_loc_plist.changed or wifi_loc_agent.rc != 0
+      changed_when: true

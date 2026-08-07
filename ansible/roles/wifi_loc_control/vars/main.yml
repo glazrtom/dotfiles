@@ -1,0 +1,6 @@
+path_local_bin: "{{ path_local }}/bin"
+path_wifi_loc_config: "{{ path_home }}/.wifi-loc-control"
+path_wifi_loc_dotfiles: "{{ path_dotfiles }}/wifi-loc-control"
+path_launch_agents: "{{ path_home }}/Library/LaunchAgents"
+wifi_loc_label: application.com.wifi-loc-control
+wifi_loc_location: Home

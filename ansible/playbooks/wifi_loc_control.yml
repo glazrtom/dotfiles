@@ -1,0 +1,4 @@
+- name: Setup WiFiLocControl
+  hosts: all
+  roles:
+    - wifi_loc_control
