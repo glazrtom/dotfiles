@@ -29,10 +29,10 @@ ex ()
 alias vim=nvim
 
 # List commands
-alias ls='exa -a --color=always --icons=always --group-directories-first'
-alias ll='exa -alF --color=always --icons=always --group-directories-first'
-alias lt='exa -aT --color=always --icons=always --group-directories-first'
-alias l.='exa -a | grep "^\."'
+alias ls='eza -a --color=always --icons=always --group-directories-first'
+alias ll='eza -alF --color=always --icons=always --group-directories-first'
+alias lt='eza -aT --color=always --icons=always --group-directories-first'
+alias l.='eza -a | grep "^\."'
 
 # Quick access to the zshrc files
 alias zshrc='${=EDITOR} ~/.zshrc'

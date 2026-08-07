@@ -57,15 +57,11 @@
     state: directory
     mode: '0755'
 
-- name: Add cpm (claude-profile-manager) homebrew tap
-  community.general.homebrew_tap:
-    name: jakubkontra/tap
-  when: os_macos
-
 - name: Install cpm (claude-profile-manager) on macOS
-  community.general.homebrew:
-    name: cpm
-    state: present
+  ansible.builtin.get_url:
+    url: "{{ cpm_version_url_base }}/cpm_darwin_{{ 'arm64' if ansible_facts['architecture'] == 'arm64' else 'amd64' }}"
+    dest: "{{ path_local_bin }}/cpm"
+    mode: '0755'
   when: os_macos
 
 - name: Install cpm (claude-profile-manager) on Linux

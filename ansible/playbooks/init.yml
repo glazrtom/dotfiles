@@ -1,11 +1,23 @@
 # Core workstation bundle: updates the system, clones dotfiles, then sets up
-# zsh (+fastfetch), nvim (+config_dir), and ranger (+config_dir) via role deps.
+# git, zsh (+fastfetch), nvim (+config_dir), ranger (+config_dir), and
+# alacritty (+config_dir) via role deps.
 # Homebrew itself is installed by ansible/bootstrap.sh, not by this playbook.
 - name: Set up workstation
   hosts: all
+  vars_prompt:
+    - name: git_user_name
+      prompt: "Enter your Git user name (leave blank to keep existing)"
+      private: no
+      default: ""
+    - name: git_user_email
+      prompt: "Enter your Git user email (leave blank to keep existing)"
+      private: no
+      default: ""
   roles:
     - system_update
     - dotfiles
+    - git
     - zsh
+    - alacritty
     - nvim
     - ranger

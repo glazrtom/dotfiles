@@ -1,0 +1,67 @@
+#################################################################
+# Install Alacritty
+#################################################################
+
+- name: Install Alacritty on macOS
+  community.general.homebrew_cask:
+    name: alacritty
+    state: present
+  when: os_macos
+
+- name: Install Alacritty on Linux
+  become: true
+  package:
+    name: alacritty
+    state: present
+  when: os_linux
+
+#################################################################
+# Install Hack Nerd Font (required by alacritty.toml)
+#################################################################
+
+- name: Install Hack Nerd Font on macOS
+  community.general.homebrew_cask:
+    name: font-hack-nerd-font
+    state: present
+  when: os_macos
+
+- name: Install Hack Nerd Font on Arch Linux
+  become: true
+  community.general.pacman:
+    name: ttf-hack-nerd
+    state: present
+  when: os_archlinux
+
+# Debian/Ubuntu ship no Hack Nerd Font package, so fetch the release directly.
+- name: Install Hack Nerd Font on Debian/Ubuntu
+  when: os_debian
+  block:
+    - name: Ensure user fonts directory exists
+      file:
+        path: "{{ path_fonts }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download and extract Hack Nerd Font
+      ansible.builtin.unarchive:
+        src: "{{ alacritty_font_url }}"
+        dest: "{{ path_fonts }}"
+        remote_src: yes
+        creates: "{{ path_fonts }}/HackNerdFont-Regular.ttf"
+      register: hack_nerd_font
+
+    - name: Refresh font cache
+      ansible.builtin.command: fc-cache -f
+      when: hack_nerd_font.changed
+      changed_when: true
+
+#################################################################
+# Config
+#################################################################
+
+- name: Link alacritty config
+  file:
+    src: "{{ path_dotfiles }}/alacritty"
+    dest: "{{ path_config_alacritty }}"
+    state: link
+    force: yes

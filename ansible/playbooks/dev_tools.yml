@@ -1,0 +1,6 @@
+# Developer tooling bundle. Run after playbooks/init.yml.
+- name: Install developer tools
+  hosts: all
+  roles:
+    - claude
+    - vscode

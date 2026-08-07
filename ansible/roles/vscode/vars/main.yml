@@ -1,0 +1,13 @@
+path_vscode_dotfiles: "{{ path_dotfiles }}/vscode"
+# VS Code's user-config dir differs per OS
+path_vscode_user: "{{ (path_home + '/Library/Application Support/Code/User') if os_macos else (path_config + '/Code/User') }}"
+# Pin to the app bundle's CLI on macOS rather than relying on the cask's
+# `code` shim being on Ansible's non-login PATH.
+vscode_cli: "{{ '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' if os_macos else 'code' }}"
+# Marketplace IDs are case-insensitive; keep this list lowercase so the
+# `--list-extensions` diff in tasks/main.yml matches correctly.
+vscode_extensions:
+  - anthropic.claude-code
+  - eamodio.gitlens
+  - editorconfig.editorconfig
+  - redhat.vscode-yaml

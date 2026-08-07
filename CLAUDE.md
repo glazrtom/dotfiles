@@ -20,12 +20,15 @@ ansible-playbook playbooks/init.yml -K
 ```
 
 - **Layout**: `roles/*` hold task logic; `playbooks/*` are thin entry points. Roles pull dependencies via `meta/main.yml` (e.g. `zsh`→`fastfetch`, `nvim`/`ranger`→`config_dir`). Tunables live in each role's `defaults/main.yml`.
-- `playbooks/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger`. Run individually via `playbooks/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only. Homebrew itself is installed only by `ansible/bootstrap.sh` (not a role) — playbooks assume `brew` is already on `PATH` on macOS.
+- `playbooks/init.yml` — core bundle: `system_update` → `dotfiles` (clone/update) → `zsh` → `nvim` → `ranger` → `alacritty`. Run individually via `playbooks/<tool>.yml`. Prompt-bearing tools (`git`, `docker`) keep a thin playbook because `vars_prompt` is play-level only. Homebrew itself is installed only by `ansible/bootstrap.sh` (not a role) — playbooks assume `brew` is already on `PATH` on macOS.
 - **Transport for dotfiles**: `dotfiles_transport` (`group_vars/all.yml`) is `ssh` — clones everything incl. private submodules, bootstraps an SSH key.
 - Hosts: single `inventory.ini` with just `[local]` (localhost).
 - **Add a new tool**: create `roles/<tool>/` (tasks + optional `defaults`/`meta`) and either wire it into `playbooks/init.yml` or give it a thin `playbooks/<tool>.yml`.
 - **Server/homelab provisioning** (k3s, MetalLB, ArgoCD, etc.) moved to the `homelab` repo — see `~/projects/homelab/ansible` (`playbooks/main.yml`).
 - **`playbooks/claude.yml`** installs Claude Code, ccstatusline, and `cpm` (claude-profile-manager), then symlinks `claude/settings.json` → `~/.claude/settings.json` and `claude/ccstatusline/settings.json` → `~/.config/ccstatusline/settings.json`. `~/.claude` must stay a real directory (Claude writes ~100M+ of transcripts/cache/credentials into it) — only individual files are linked into it, never the directory itself. Only these two config files are tracked; everything else under `~/.claude` (history, credentials, daemon state, plugin cache, projects) is machine state and stays untracked.
+- **`roles/vscode`** installs VS Code (Homebrew cask on macOS — the first cask user in this repo; Microsoft's apt repo on Debian/Ubuntu; `extra/code` via pacman on Arch, which is the OSS/Open-VSX build) and symlinks `vscode/settings.json` + `vscode/keybindings.json` into the OS-specific VS Code user dir (`~/Library/Application Support/Code/User` on macOS, `~/.config/Code/User` on Linux). It also installs the extension list from `roles/vscode/vars/main.yml` via `code --install-extension`. Only those two config files are tracked; the rest of the user dir is machine state.
+- **`playbooks/dev_tools.yml`** is the developer-tooling bundle: `claude` + `vscode` + `ranger` in one run. Meant to be run after `playbooks/init.yml`.
+- **`roles/alacritty`** installs Alacritty (Homebrew cask on macOS; `package:` on Linux) and the Hack Nerd Font it requires (cask `font-hack-nerd-font` on macOS, `ttf-hack-nerd` via pacman on Arch, downloaded from the Nerd Fonts GitHub release into `~/.local/share/fonts` on Debian/Ubuntu since no apt package exists), then symlinks `alacritty/` → `~/.config/alacritty`.
 
 ### Bash installer (`setup/`) — legacy, still used for granular/interactive scripts
 Entry point `setup/setup.sh`, exposed as the `setup` zsh function (tab-completes over `setup/scripts/`):
@@ -39,7 +42,7 @@ Entry point `setup/setup.sh`, exposed as the `setup` zsh function (tab-completes
 
 - `zsh/.zshrc` is the main config; it sources `zsh/zsh_alias` for **all** aliases/functions — put new shell customizations in `zsh_alias`, not `.zshrc`. Edit shortcuts: `zshrc` / `zshalias` aliases.
 - No plugin manager: plugins are either system packages installed via Ansible (zsh-autosuggestions, zsh-syntax-highlighting, autojump) or vendored as git submodules under `zsh/` (`powerlevel10k/`, `zsh-history-substring-search/`).
-- `exa` replaces `ls` (`ls`/`ll`/`lt`), `nvim` is `$EDITOR`, git aliases `g`/`ga`/`gc`/`gh`(checkout)/`gA`(amend)/`gd`/`gl`/`gp`/`gs`/`gf`, `k`=kubectl.
+- `eza` replaces `ls` (`ls`/`ll`/`lt`), `nvim` is `$EDITOR`, git aliases `g`/`ga`/`gc`/`gh`(checkout)/`gA`(amend)/`gd`/`gl`/`gp`/`gs`/`gf`, `k`=kubectl.
 - Equivalent functions also exist for fish under `fish/functions/` if that shell needs updating too.
 
 ### Git worktree workflow (custom functions in `zsh/zsh_alias`)

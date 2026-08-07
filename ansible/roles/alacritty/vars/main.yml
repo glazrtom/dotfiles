@@ -1,0 +1,3 @@
+path_config_alacritty: "{{ path_config }}/alacritty"
+path_fonts: "{{ (path_home + '/Library/Fonts') if os_macos else (path_local + '/share/fonts') }}"
+alacritty_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip

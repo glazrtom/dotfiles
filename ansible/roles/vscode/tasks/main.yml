@@ -1,0 +1,96 @@
+#################################################################
+# macOS INSTALLATION (Homebrew cask)
+#################################################################
+
+- name: Install Visual Studio Code on macOS
+  community.general.homebrew_cask:
+    name: visual-studio-code
+    state: present
+  when: os_macos
+
+#################################################################
+# Linux: VS Code (Debian/Ubuntu via Microsoft apt repo)
+#################################################################
+
+- name: Install VS Code on Debian/Ubuntu
+  become: true
+  block:
+    - name: Ensure apt keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Microsoft apt signing key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        dest: /etc/apt/keyrings/microsoft.asc
+        mode: '0644'
+
+    - name: Add VS Code apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/microsoft.asc] https://packages.microsoft.com/repos/code stable main"
+        filename: vscode
+        state: present
+
+    - name: Install code
+      ansible.builtin.apt:
+        name: code
+        state: present
+        update_cache: yes
+  when: os_debian
+
+# Arch Linux ships the OSS build (extra/code) — Open VSX marketplace, no
+# MS-branded telemetry. The MS build would be visual-studio-code-bin from
+# the AUR, which would need the kewlfft.aur collection — deliberately not
+# added here.
+- name: Install VS Code (OSS build) on Arch Linux
+  become: true
+  community.general.pacman:
+    name: code
+    state: present
+  when: os_archlinux
+
+#################################################################
+# Config
+#################################################################
+
+- name: Ensure VS Code user config directory exists
+  file:
+    path: "{{ path_vscode_user }}"
+    state: directory
+    mode: '0755'
+
+- name: Link VS Code settings.json
+  file:
+    src: "{{ path_vscode_dotfiles }}/settings.json"
+    dest: "{{ path_vscode_user }}/settings.json"
+    state: link
+    force: yes
+
+- name: Link VS Code keybindings.json
+  file:
+    src: "{{ path_vscode_dotfiles }}/keybindings.json"
+    dest: "{{ path_vscode_user }}/keybindings.json"
+    state: link
+    force: yes
+
+#################################################################
+# Extensions
+#################################################################
+
+- name: List installed VS Code extensions
+  ansible.builtin.command:
+    argv:
+      - "{{ vscode_cli }}"
+      - --list-extensions
+  register: vscode_installed
+  changed_when: false
+
+- name: Install VS Code extensions
+  ansible.builtin.command:
+    argv:
+      - "{{ vscode_cli }}"
+      - --install-extension
+      - "{{ item }}"
+  loop: "{{ vscode_extensions | difference(vscode_installed.stdout_lines | map('lower') | list) }}"

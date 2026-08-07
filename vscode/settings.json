@@ -1,0 +1,10 @@
+{
+  "editor.fontFamily": "Hack Nerd Font",
+  "editor.renderWhitespace": "trailing",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "workbench.colorTheme": "Dark+",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "telemetry.telemetryLevel": "off"
+}
