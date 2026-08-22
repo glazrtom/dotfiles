@@ -6,5 +6,6 @@
   "workbench.colorTheme": "Dark+",
   "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.defaultProfile.linux": "zsh",
-  "telemetry.telemetryLevel": "off"
+  "telemetry.telemetryLevel": "off",
+  "git.autofetch": true
 }
