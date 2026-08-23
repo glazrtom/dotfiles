@@ -115,10 +115,13 @@ alias rr='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/mas
 
 # ranger function with auto-cd to directory
 function r {
-    local SID=$(LC_CTYPE=C tr -dc A-Za-z0-9 </dev/urandom | head -c 10)
-    ranger --choosedir=$HOME/.config/ranger/sessions/$SID
-    cd "$(cat ~/.config/ranger/sessions/$SID)"
-    rm ~/.config/ranger/sessions/$SID
+    local tmp
+    tmp="$(mktemp -t ranger-cwd)" || return
+    ranger --choosedir="$tmp"
+    local dir
+    dir="$(<"$tmp")"
+    rm -f "$tmp"
+    [[ -n "$dir" && -d "$dir" && "$dir" != "$PWD" ]] && cd "$dir"
 }
 
 # create folder and move to the folder

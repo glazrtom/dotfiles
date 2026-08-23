@@ -1,0 +1,2 @@
+path_fonts: "{{ (path_home + '/Library/Fonts') if os_macos else (path_local + '/share/fonts') }}"
+nerd_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip

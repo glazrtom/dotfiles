@@ -1,0 +1,4 @@
+- name: Setup Ghostty
+  hosts: all
+  roles:
+    - ghostty

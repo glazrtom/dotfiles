@@ -1,0 +1,56 @@
+# Matches the Dracula look from alacritty/alacritty.toml + dracula.toml.
+theme = Dracula+
+
+font-family = Hack Nerd Font Mono
+font-size = 14
+
+background-opacity = 0.9
+background-blur = true
+
+scrollback-limit = 10000000
+
+# Alacritty sends ESC CR on Shift+Return so terminal apps can tell it apart
+# from plain Enter.
+keybind = shift+enter=text:\x1b\r
+
+# macos-option-as-alt is intentionally left unset: on the Czech layout its
+# default is already "false", so Option keeps composing diacritics/digits
+# instead of being swallowed as Alt.
+
+# Tab switching, Czech layout: the number row lives under Option (opt+2 = "2"),
+# so cmd+opt+<key> is the natural press for "go to tab N" — but Ghostty only
+# binds cmd+<physical digit> by default. physical digit_N codes are
+# layout-independent; the second block below matches the same keys by the
+# character they actually produce on Czech (+ ě š č ř ž ý á í é for 1-0),
+# since Ghostty matches Unicode triggers against the *unmodified* codepoint,
+# never the Option-shifted one. Both forms are added so cmd+<key> and
+# cmd+opt+<key> both work; physical-key matches always win over Unicode ones,
+# so there's no conflict.
+keybind = super+alt+digit_1=goto_tab:1
+keybind = super+alt+digit_2=goto_tab:2
+keybind = super+alt+digit_3=goto_tab:3
+keybind = super+alt+digit_4=goto_tab:4
+keybind = super+alt+digit_5=goto_tab:5
+keybind = super+alt+digit_6=goto_tab:6
+keybind = super+alt+digit_7=goto_tab:7
+keybind = super+alt+digit_8=goto_tab:8
+keybind = super+alt+digit_9=last_tab
+
+keybind = super++=goto_tab:1
+keybind = super+alt++=goto_tab:1
+keybind = super+ě=goto_tab:2
+keybind = super+alt+ě=goto_tab:2
+keybind = super+š=goto_tab:3
+keybind = super+alt+š=goto_tab:3
+keybind = super+č=goto_tab:4
+keybind = super+alt+č=goto_tab:4
+keybind = super+ř=goto_tab:5
+keybind = super+alt+ř=goto_tab:5
+keybind = super+ž=goto_tab:6
+keybind = super+alt+ž=goto_tab:6
+keybind = super+ý=goto_tab:7
+keybind = super+alt+ý=goto_tab:7
+keybind = super+á=goto_tab:8
+keybind = super+alt+á=goto_tab:8
+keybind = super+í=last_tab
+keybind = super+alt+í=last_tab

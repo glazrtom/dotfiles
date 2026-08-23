@@ -1,0 +1,1 @@
+path_config_ghostty: "{{ path_config }}/ghostty"

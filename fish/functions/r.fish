@@ -1,8 +1,10 @@
 function r
-    mkdir -p ~/.config/ranger/sessions/
-    find $HOME/.config/ranger/sessions/ -mindepth 1 -mtime +2 -exec rm {} \; 2> /dev/null
-    set SID (tr -dc A-Za-z0-9 </dev/urandom | head -c 13)
-    ranger --choosedir=$HOME/.config/ranger/sessions/$SID
-    cd (cat ~/.config/ranger/sessions/$SID)
-    rm ~/.config/ranger/sessions/$SID
+    set -l tmp (mktemp -t ranger-cwd)
+    or return
+    ranger --choosedir=$tmp
+    set -l dir (cat $tmp)
+    rm -f $tmp
+    if test -n "$dir"; and test -d "$dir"; and test "$dir" != "$PWD"
+        cd $dir
+    end
 end

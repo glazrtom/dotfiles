@@ -12,7 +12,7 @@ autoload -U colors && colors
 PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
 
 # Custom settings
-export TERM="xterm-256color"
+[[ "$TERM" == xterm-ghostty ]] || export TERM="xterm-256color"
 export EDITOR=nvim
 export MANPAGER="nvim -c 'Man!' -o -"
 

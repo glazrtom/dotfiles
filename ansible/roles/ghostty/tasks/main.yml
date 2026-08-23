@@ -1,27 +1,20 @@
 #################################################################
-# Install Alacritty
+# Install Ghostty (macOS only — no Linux package wired up here yet)
 #################################################################
 
-- name: Install Alacritty on macOS
+- name: Install Ghostty on macOS
   community.general.homebrew_cask:
-    name: alacritty
+    name: ghostty
     state: present
   when: os_macos
-
-- name: Install Alacritty on Linux
-  become: true
-  package:
-    name: alacritty
-    state: present
-  when: os_linux
 
 #################################################################
 # Config
 #################################################################
 
-- name: Link alacritty config
+- name: Link ghostty config
   file:
-    src: "{{ path_dotfiles }}/alacritty"
-    dest: "{{ path_config_alacritty }}"
+    src: "{{ path_dotfiles }}/ghostty"
+    dest: "{{ path_config_ghostty }}"
     state: link
     force: yes
