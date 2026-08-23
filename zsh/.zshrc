@@ -24,9 +24,10 @@ export USER_GROUP=$(id -g)
 export KUBECONFIG=~/.kube/config
 
 OS="$(uname)"
-[[ "$(uname)" == "Darwin" ]]
+[[ "$OSTYPE" == darwin* ]]
 IS_MAC=$?
-[[ "$(cat /etc/os-release | grep -i 'ID_LIKE=debian')" ]]
+
+command -v apt &>/dev/null
 IS_DEBIAN_BASED=$?
 
 # History setup:
@@ -116,7 +117,9 @@ export PATH="$PATH:$HOME/.local/bin"
 export PATH="$HOME/.mint/bin:$PATH"
 export PATH="$JAVA_HOME/bin:$PATH"
 
-eval "$($HOME/.local/bin/mise activate zsh)"
+if command -v mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+fi
 
 # welcome screen
 fastfetch
