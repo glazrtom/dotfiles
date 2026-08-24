@@ -9,6 +9,14 @@ background-blur = true
 
 scrollback-limit = 10000000
 
+# ssh-terminfo copies Ghostty's xterm-ghostty terminfo entry to remote hosts on first
+# connect (via `infocmp | ssh … tic -x -`), so remote ncurses apps and powerlevel10k
+# render correctly instead of falling back to a wrong capability set (doubled echo,
+# mangled prompt). ssh-env forwards COLORTERM / TERM_PROGRAM(_VERSION) so remotes
+# detect truecolor. Listed alongside the defaults (cursor,sudo,title) since setting
+# this key replaces them rather than adding to them.
+shell-integration-features = cursor,sudo,title,ssh-env,ssh-terminfo
+
 # Alacritty sends ESC CR on Shift+Return so terminal apps can tell it apart
 # from plain Enter.
 keybind = shift+enter=text:\x1b\r
