@@ -1715,6 +1715,13 @@
   #               typed after changing current working directory.
   typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
 
+  # Marks the start/end of the prompt with OSC 133 so terminals that reflow text on
+  # resize (Ghostty, kitty) clear and redraw the prompt themselves instead of leaving a
+  # staircase of duplicated prompts behind. See "Horrific mess when resizing terminal
+  # window" in powerlevel10k's README. p10k must emit these itself — Ghostty's own
+  # precmd-injected marks are wiped by p10k's async prompt updates.
+  typeset -g POWERLEVEL9K_TERM_SHELL_INTEGRATION=true
+
   # Instant prompt mode.
   #
   #   - off:     Disable instant prompt. Choose this if you've tried instant prompt and found
