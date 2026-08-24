@@ -7,6 +7,13 @@ font-size = 14
 background-opacity = 0.9
 background-blur = true
 
+# Small breathing room around the text; Ghostty's default is 2px on each side.
+# window-padding-balance spreads the leftover pixels (the window is rarely an
+# exact multiple of the cell size) evenly instead of dumping them right/bottom.
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+
 scrollback-limit = 10000000
 
 # ssh-terminfo copies Ghostty's xterm-ghostty terminfo entry to remote hosts on first
