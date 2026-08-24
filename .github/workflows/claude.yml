@@ -27,4 +27,5 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: >-
+            --model opus
             --allowedTools "Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git rev-parse:*),Bash(git checkout:*),Bash(git switch:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(cd:*),Bash(python3:*),Bash(yamllint:*),Bash(ansible-playbook --syntax-check:*),mcp__github__create_pull_request"
