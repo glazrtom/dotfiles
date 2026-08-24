@@ -1,0 +1,1 @@
+path_config_opencode: "{{ path_config }}/opencode"

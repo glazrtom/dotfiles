@@ -1,0 +1,26 @@
+#################################################################
+# Install opencode
+#################################################################
+
+- name: Install opencode on macOS
+  community.general.homebrew:
+    name: opencode
+    state: present
+  when: os_macos
+
+- name: Install opencode on Linux
+  ansible.builtin.shell: curl -fsSL https://opencode.ai/install | bash
+  args:
+    creates: "{{ path_home }}/.opencode/bin/opencode"
+  when: os_linux
+
+#################################################################
+# Config
+#################################################################
+
+- name: Link opencode config
+  file:
+    src: "{{ path_dotfiles }}/opencode"
+    dest: "{{ path_config_opencode }}"
+    state: link
+    force: yes

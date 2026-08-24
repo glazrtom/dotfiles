@@ -2,3 +2,5 @@
 /**/.idea/
 /**/.DS_Store
 /.claude/settings.local.json
+/opencode/node_modules/
+/opencode/bun.lock

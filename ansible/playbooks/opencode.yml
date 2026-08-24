@@ -1,0 +1,4 @@
+- name: Setup opencode
+  hosts: all
+  roles:
+    - opencode
