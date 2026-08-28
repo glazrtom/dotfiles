@@ -28,6 +28,15 @@ shell-integration-features = cursor,sudo,title,ssh-env,ssh-terminfo
 # from plain Enter.
 keybind = shift+enter=text:\x1b\r
 
+# Split resizing: Ghostty's default super+ctrl+<arrow> moves the divider by only
+# 10px per press, which takes a lot of presses to rebalance a split. Same keys,
+# 50px step (~5-6 rows / ~7 columns at font-size 14). super+ctrl+enter
+# (equalize_splits) is left at its default, so overshooting is easy to undo.
+keybind = super+ctrl+up=resize_split:up,50
+keybind = super+ctrl+down=resize_split:down,50
+keybind = super+ctrl+left=resize_split:left,50
+keybind = super+ctrl+right=resize_split:right,50
+
 # macos-option-as-alt is intentionally left unset: on the Czech layout its
 # default is already "false", so Option keeps composing diacritics/digits
 # instead of being swallowed as Alt.
