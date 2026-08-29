@@ -31,6 +31,16 @@
     ]
   },
   "permissions": {
+    "allow": [
+      "Bash(ghostty +list-actions:*)",
+      "Bash(ghostty +list-keybinds:*)",
+      "Bash(ghostty +show-config:*)",
+      "Bash(ghostty +list-themes:*)",
+      "Bash(ghostty +list-colors:*)",
+      "Bash(ghostty +list-fonts:*)",
+      "Bash(ghostty +validate-config:*)",
+      "Bash(ghostty +version:*)"
+    ],
     "ask": ["Bash(dangerouslyDisableSandbox:true)"]
   }
 }

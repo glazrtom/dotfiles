@@ -78,3 +78,9 @@ keybind = super+á=goto_tab:8
 keybind = super+alt+á=goto_tab:8
 keybind = super+í=last_tab
 keybind = super+alt+í=last_tab
+
+# Ghostty has no default keybind for renaming a tab — prompt_tab_title is only
+# reachable via the command palette (super+shift+p → "Change Tab Title…").
+# super+shift+r is unbound in Ghostty's defaults, and 'r' sits in the same place
+# on the Czech layout, so no physical-key/Unicode dance is needed here.
+keybind = super+shift+r=prompt_tab_title
