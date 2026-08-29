@@ -7,5 +7,6 @@
   "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.defaultProfile.linux": "zsh",
   "telemetry.telemetryLevel": "off",
-  "git.autofetch": true
+  "git.autofetch": true,
+  "files.autoSave": "onWindowChange"
 }
