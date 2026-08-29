@@ -37,6 +37,13 @@ keybind = super+ctrl+down=resize_split:down,50
 keybind = super+ctrl+left=resize_split:left,50
 keybind = super+ctrl+right=resize_split:right,50
 
+# Ghostty has no default binding for reordering tabs — move_tab exists as an
+# action but is unbound. super+shift+arrow_left/right are free in the defaults
+# (Ghostty's own previous_tab/next_tab use super+shift+[ / ]), and arrow keys
+# are layout-independent, so no Czech Unicode-trigger duplicate is needed here.
+keybind = super+shift+arrow_left=move_tab:-1
+keybind = super+shift+arrow_right=move_tab:1
+
 # macos-option-as-alt is intentionally left unset: on the Czech layout its
 # default is already "false", so Option keeps composing diacritics/digits
 # instead of being swallowed as Alt.
