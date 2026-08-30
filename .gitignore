@@ -4,3 +4,4 @@
 /.claude/settings.local.json
 /opencode/node_modules/
 /opencode/bun.lock
+/raycast/*.rayconfig

@@ -74,23 +74,3 @@
     dest: "{{ path_vscode_user }}/keybindings.json"
     state: link
     force: yes
-
-#################################################################
-# Extensions
-#################################################################
-
-- name: List installed VS Code extensions
-  ansible.builtin.command:
-    argv:
-      - "{{ vscode_cli }}"
-      - --list-extensions
-  register: vscode_installed
-  changed_when: false
-
-- name: Install VS Code extensions
-  ansible.builtin.command:
-    argv:
-      - "{{ vscode_cli }}"
-      - --install-extension
-      - "{{ item }}"
-  loop: "{{ vscode_extensions | difference(vscode_installed.stdout_lines | map('lower') | list) }}"

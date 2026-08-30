@@ -2,12 +2,94 @@
 # Install Raycast (macOS only — no Linux build exists)
 #################################################################
 
-# Raycast's settings live in its own internal database and sync via a
-# Raycast account, not a file — so there's nothing here to symlink from
-# dotfiles/, unlike most other roles.
+# Raycast's real settings live in an encrypted SQLite database
+# (~/Library/Application Support/com.raycast.macos/raycast-enc.sqlite) and
+# the rest of ~/Library/Preferences/com.raycast.macos.plist is machine state
+# (onboarding flags, analytics IDs, window-position cache) rewritten
+# wholesale by cfprefsd — none of that can be symlinked from dotfiles/. What
+# *can* be tracked: the Script Commands directory below, the extension list,
+# and (manually, see raycast/README.md) a .rayconfig export.
 
 - name: Install Raycast on macOS
   community.general.homebrew_cask:
     name: raycast
     state: present
   when: os_macos
+
+#################################################################
+# Script Commands directory
+#################################################################
+
+- name: Check whether the Raycast scripts symlink already exists
+  ansible.builtin.stat:
+    path: "{{ path_raycast_scripts }}"
+  register: raycast_scripts_stat
+  when: os_macos
+
+- name: Link Raycast script commands directory
+  file:
+    src: "{{ path_raycast_dotfiles }}/scripts"
+    dest: "{{ path_raycast_scripts }}"
+    state: link
+    force: yes
+  when: os_macos
+
+- name: Remind about one-time Script Commands registration
+  ansible.builtin.debug:
+    msg: >-
+      First-time setup: in Raycast, go to Settings → Extensions → Script
+      Commands → Add Script Directory, and add {{ path_raycast_scripts }}.
+      This can't be automated — Raycast stores it in its encrypted database.
+  when: os_macos and not raycast_scripts_stat.stat.exists
+
+#################################################################
+# Extensions (reported, not installed — Raycast has no install CLI)
+#################################################################
+
+- name: Check whether the Raycast extensions directory exists
+  ansible.builtin.stat:
+    path: "{{ path_raycast_config }}/extensions"
+  register: raycast_extensions_dir
+  when: os_macos
+
+- name: Find installed Raycast extension manifests
+  ansible.builtin.find:
+    paths: "{{ path_raycast_config }}/extensions"
+    patterns: package.json
+    recurse: yes
+    depth: 2
+    file_type: file
+  register: raycast_extension_manifests
+  when: os_macos and raycast_extensions_dir.stat.exists
+
+- name: Read installed Raycast extension manifests
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ raycast_extension_manifests.files | default([]) }}"
+  register: raycast_extension_manifest_contents
+  when: os_macos and raycast_extensions_dir.stat.exists
+
+- name: Determine installed owner/name pairs
+  ansible.builtin.set_fact:
+    raycast_installed_extensions: "{{ raycast_installed_extensions | default([]) + [(raycast_pkg.owner | default(raycast_pkg.author, true)) + '/' + raycast_pkg.name] }}"
+  loop: "{{ raycast_extension_manifest_contents.results | default([]) }}"
+  vars:
+    raycast_pkg: "{{ item.content | b64decode | from_json }}"
+  when: os_macos and raycast_extensions_dir.stat.exists
+
+- name: Report Raycast extensions from raycast_extensions not yet installed
+  ansible.builtin.debug:
+    msg: >-
+      Not installed: {{ item }} — install manually via
+      raycast://extensions/{{ item }}
+  loop: "{{ raycast_extensions | difference(raycast_installed_extensions | default([])) }}"
+  when: os_macos and raycast_extensions_dir.stat.exists
+
+- name: Open store pages for missing Raycast extensions
+  ansible.builtin.command:
+    argv:
+      - open
+      - "raycast://extensions/{{ item }}"
+  loop: "{{ raycast_extensions | difference(raycast_installed_extensions | default([])) }}"
+  when: os_macos and raycast_extensions_dir.stat.exists and raycast_open_extension_deeplinks
+  changed_when: false

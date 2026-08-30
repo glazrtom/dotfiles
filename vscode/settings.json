@@ -3,7 +3,7 @@
   "editor.renderWhitespace": "trailing",
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "workbench.colorTheme": "Dark+",
+  "workbench.colorTheme": "Dracula Pro (Van Helsing)",
   "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.defaultProfile.linux": "zsh",
   "telemetry.telemetryLevel": "off",

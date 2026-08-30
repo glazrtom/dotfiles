@@ -1,0 +1,4 @@
+# When true, open a raycast://extensions/<owner>/<name> deeplink (store page)
+# for each extension in raycast_extensions that isn't installed yet. Off by
+# default since it hijacks the desktop by popping open Raycast/the browser.
+raycast_open_extension_deeplinks: false

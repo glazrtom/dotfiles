@@ -1,0 +1,12 @@
+path_raycast_dotfiles: "{{ path_dotfiles }}/raycast"
+path_raycast_config: "{{ path_config }}/raycast"
+path_raycast_scripts: "{{ path_raycast_config }}/scripts"
+
+# Store extensions currently installed, as owner/name (matches each
+# extension's package.json). Raycast has no install CLI, so this list is
+# only diffed and reported — see tasks/main.yml.
+raycast_extensions:
+  - mattisssa/spotify-player
+  - thomas/color-picker
+  - thomas/visual-studio-code
+  - rolandleth/kill-process
