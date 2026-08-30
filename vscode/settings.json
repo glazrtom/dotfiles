@@ -9,5 +9,6 @@
   "telemetry.telemetryLevel": "off",
   "git.autofetch": true,
   "files.autoSave": "onWindowChange",
-  "workbench.startupEditor": "none"
+  "workbench.startupEditor": "none",
+  "editor.accessibilitySupport": "off"
 }
