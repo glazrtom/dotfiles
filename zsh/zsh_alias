@@ -88,6 +88,7 @@ alias cl='clear; fastfetch'
 alias sc='php bin/console'
 alias dockerkill='docker kill $(docker ps -q)'
 alias as='studio .'
+alias vs='code . && exit'
 
 function setup {
   cd "$DOTFILES/setup" || return
