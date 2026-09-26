@@ -8,7 +8,7 @@
   "terminal.integrated.defaultProfile.linux": "zsh",
   "telemetry.telemetryLevel": "off",
   "git.autofetch": true,
-  "files.autoSave": "onWindowChange",
+  "files.autoSave": "onFocusChange",
   "workbench.startupEditor": "none",
   "editor.accessibilitySupport": "off",
   "gitlens.graph.details.location": "auto",
