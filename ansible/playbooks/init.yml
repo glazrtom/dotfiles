@@ -18,7 +18,6 @@
     - dotfiles
     - git
     - zsh
-    - alacritty
     - nvim
     - ranger
     - wifi_loc_control
