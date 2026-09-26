@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap a fresh macOS machine: Homebrew, Ansible, a GitHub SSH key,
+# Bootstrap a fresh macOS machine: Homebrew, Ansible + ansible-lint, a GitHub SSH key,
 # a clone of this repo (with submodules), and Ansible's collections.
 # Meant to be curl-able on a machine that doesn't have the repo yet:
 #   curl -fsSL https://raw.githubusercontent.com/glazrtom/dotfiles/master/ansible/bootstrap.sh | bash
@@ -34,6 +34,13 @@ if ! command -v ansible-playbook >/dev/null 2>&1; then
   brew install ansible
 else
   echo "Ansible already installed."
+fi
+
+if ! command -v ansible-lint >/dev/null 2>&1; then
+  echo "Installing ansible-lint..."
+  brew install ansible-lint
+else
+  echo "ansible-lint already installed."
 fi
 
 # ---------------------------------------------------------------------------
