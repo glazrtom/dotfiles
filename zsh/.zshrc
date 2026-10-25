@@ -121,6 +121,9 @@ if command -v mise &>/dev/null; then
   eval "$(mise activate zsh)"
 fi
 
+# macOS $TMPDIR is so long that zellij socket paths exceed the 103-byte sun_path limit
+[[ $IS_MAC -eq 0 ]] && export ZELLIJ_SOCKET_DIR="/tmp/zellij-$USER_ID"
+
 # welcome screen
 fastfetch
 

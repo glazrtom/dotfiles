@@ -5,6 +5,16 @@
       "type": "local",
       "enabled": true,
       "command": ["npx", "-y", "kubernetes-mcp-server@latest"]
+    },
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v2/mcp"
+    },
+    "servers": {
+      "excalidraw": {
+        "type": "remote",
+        "url": "https://mcp.excalidraw.com/mcp"
+      }
     }
   }
 }
