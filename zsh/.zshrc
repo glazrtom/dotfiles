@@ -51,6 +51,8 @@ zmodload zsh/complist
 _comp_options+=(globdots)               # Include hidden files.
 
 # Custom ZSH Binds
+# Use emacs keymap (zsh auto-selects vi mode because EDITOR=nvim)
+bindkey -e
 bindkey '^ ' autosuggest-accept
 
 # change dir shortcut
