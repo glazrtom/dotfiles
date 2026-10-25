@@ -81,6 +81,32 @@
         creates: "{{ path_dotfiles }}/{{ item }}/.git"
       loop: "{{ dotfiles_submodules }}"
 
+    # Private repos: only succeeds when HTTPS credentials are configured.
+    # GIT_TERMINAL_PROMPT=0 makes git fail fast instead of asking for a password.
+    - name: Try private submodules over HTTPS (best effort)
+      ansible.builtin.command:
+        cmd: >-
+          git -c url."https://github.com/".insteadOf="git@github.com:"
+          submodule update --init --recursive -- {{ item }}
+        chdir: "{{ path_dotfiles }}"
+        creates: "{{ path_dotfiles }}/{{ item }}/.git"
+      environment:
+        GIT_TERMINAL_PROMPT: "0"
+      loop: "{{ dotfiles_private_submodules }}"
+      register: dotfiles_private_results
+      failed_when: false
+
+    - name: Warn about private submodules that could not be cloned
+      ansible.builtin.debug:
+        msg: >-
+          Private submodule '{{ item.item }}' was not cloned (no HTTPS
+          credentials). Re-run with -e dotfiles_transport=ssh or configure
+          `gh auth setup-git`.
+      when: item.rc | default(0) != 0
+      loop: "{{ dotfiles_private_results.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
 - name: Fail on unknown transport
   ansible.builtin.fail:
     msg: "dotfiles_transport must be 'ssh' or 'https', got '{{ dotfiles_transport }}'"

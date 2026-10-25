@@ -59,3 +59,6 @@
 [submodule "zsh/fzf-tab"]
 	path = zsh/fzf-tab
 	url = https://github.com/Aloxaf/fzf-tab.git
+[submodule "opencode"]
+	path = opencode
+	url = git@github.com:glazrtom/opencode.git

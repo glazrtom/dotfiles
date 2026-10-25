@@ -14,5 +14,13 @@ dotfiles_submodules:
   - zsh/zsh-autocomplete
   - zsh/zsh-history-substring-search
   - ranger/plugins/ranger_devicons
+  - zsh/fzf-tab
+  - wifi-loc-control/upstream
+
+# Private submodules (need GitHub auth). In HTTPS mode they are attempted
+# best-effort (works with a credential helper, e.g. `gh auth setup-git`) and
+# skipped with a warning otherwise. SSH mode always clones them.
+dotfiles_private_submodules:
+  - opencode
 
 ssh_key_path: "{{ ansible_facts.env.HOME }}/.ssh/id_ed25519"

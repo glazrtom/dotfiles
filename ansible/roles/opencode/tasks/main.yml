@@ -18,9 +18,24 @@
 # Config
 #################################################################
 
+# Config lives in the private `opencode` submodule (glazrtom/opencode).
+- name: Check that the opencode config submodule is checked out
+  ansible.builtin.stat:
+    path: "{{ path_dotfiles }}/opencode/opencode.jsonc"
+  register: opencode_config
+
 - name: Link opencode config
   file:
     src: "{{ path_dotfiles }}/opencode"
     dest: "{{ path_config_opencode }}"
     state: link
     force: yes
+  when: opencode_config.stat.exists
+
+- name: Skip opencode config link (private submodule missing)
+  ansible.builtin.debug:
+    msg: >-
+      The private opencode submodule is not checked out, so the config was not
+      linked. Use dotfiles_transport=ssh or run
+      `git submodule update --init opencode` once GitHub auth works.
+  when: not opencode_config.stat.exists
