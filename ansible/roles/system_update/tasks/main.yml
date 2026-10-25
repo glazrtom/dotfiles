@@ -24,8 +24,65 @@
     update_cache: yes
   when: os_redhat
 
-- name: Update Homebrew and upgrade all packages (macOS)
-  community.general.homebrew:
-    update_homebrew: yes
-    upgrade_all: yes
+# Upgrading ansible (or one of its deps, e.g. python) in place deletes the
+# Cellar dir the running ansible-playbook is loading code from, crashing the
+# play. Pin them for the duration of `brew upgrade`; upgrade them afterwards.
+- name: Upgrade Homebrew packages, holding back Ansible (macOS)
   when: os_macos
+  vars:
+    brew_upgrade_held_roots: [ansible, ansible-lint]
+  block:
+    - name: List installed Homebrew formulae (macOS)
+      ansible.builtin.command: brew list --formula -1
+      register: brew_installed
+      changed_when: false
+
+    - name: List Ansible dependencies (macOS)
+      ansible.builtin.command: brew deps --installed --union {{ brew_upgrade_held_roots | join(' ') }}
+      register: brew_ansible_deps
+      changed_when: false
+
+    - name: List pinned Homebrew formulae (macOS)
+      ansible.builtin.command: brew list --pinned
+      register: brew_pinned
+      changed_when: false
+
+    - name: Compute formulae to hold back (macOS)
+      ansible.builtin.set_fact:
+        brew_held: "{{ (brew_upgrade_held_roots + brew_ansible_deps.stdout_lines) | intersect(brew_installed.stdout_lines) }}"
+        # Only touch pins we add, so pins set by hand survive the unpin below
+        brew_to_pin: "{{ (brew_upgrade_held_roots + brew_ansible_deps.stdout_lines) | intersect(brew_installed.stdout_lines) | difference(brew_pinned.stdout_lines) }}"
+
+    - name: Update Homebrew and upgrade all packages (macOS)
+      block:
+        - name: Pin Ansible and its dependencies (macOS)
+          ansible.builtin.command: brew pin {{ brew_to_pin | join(' ') }}
+          when: brew_to_pin | length > 0
+          changed_when: true
+
+        - name: Update Homebrew and upgrade all unpinned packages (macOS)
+          community.general.homebrew:
+            update_homebrew: yes
+            upgrade_all: yes
+      always:
+        - name: Unpin Ansible and its dependencies (macOS)
+          ansible.builtin.command: brew unpin {{ brew_to_pin | join(' ') }}
+          when: brew_to_pin | length > 0
+          changed_when: true
+
+    - name: Check for held-back outdated formulae (macOS)
+      ansible.builtin.command: brew outdated --formula --quiet {{ brew_held | join(' ') }}
+      register: brew_held_outdated
+      changed_when: false
+      failed_when: false
+      when: brew_held | length > 0
+
+    - name: Warn about held-back formulae (macOS)
+      ansible.builtin.debug:
+        msg: >-
+          Held back so the running Ansible isn't upgraded under itself:
+          {{ brew_held_outdated.stdout_lines | join(', ') }}.
+          Run `brew upgrade` after the playbook finishes.
+      when:
+        - brew_held_outdated.stdout_lines is defined
+        - brew_held_outdated.stdout_lines | length > 0
