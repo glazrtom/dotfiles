@@ -525,7 +525,25 @@ zellij() {
     command zellij "$@"
   fi
 }
-alias z='zellij'
+
+# `z` attaches to (or creates) a session named after the cwd: parent:current
+# (`~/projects/homelab/ansible` → homelab:ansible, `~` → tom). Inside zellij it
+# switches sessions instead of nesting. Arguments pass through to zellij.
+z() {
+  (( $# )) && { zellij "$@"; return }
+  local name=${PWD:t}
+  [[ $PWD == / ]] && name=root
+  [[ $PWD != $HOME && ${PWD:h} != / ]] && name="${PWD:h:t}:$name"
+  if [[ -n $ZELLIJ ]]; then
+    [[ $name == $ZELLIJ_SESSION_NAME ]] && return
+    # switch-session doesn't create, so start it detached first
+    command zellij list-sessions -s 2>/dev/null | grep -qxF -- "$name" ||
+      command zellij attach -b "$name"
+    command zellij action switch-session "$name"
+  else
+    command zellij attach -c "$name"
+  fi
+}
 
 # Live zellij theme picker: moving the fzf cursor rewrites the `theme` line in
 # zellij/config.kdl and zellij hot-reloads it, so a running session re-skins
