@@ -51,6 +51,10 @@ keybind = super+shift+arrow_right=move_tab:1
 # macos-option-as-alt is intentionally left unset: on the Czech layout its
 # default is already "false", so Option keeps composing diacritics/digits
 # instead of being swallowed as Alt.
+#
+# fzf's Alt-C (cd into a fuzzy-picked dir) expects ESC+c. With Option left
+# as a compose key, send that sequence explicitly for just this chord.
+keybind = alt+c=esc:c
 
 # Tab switching, Czech layout: the number row lives under Option (opt+2 = "2"),
 # so cmd+opt+<key> is the natural press for "go to tab N" — but Ghostty only
