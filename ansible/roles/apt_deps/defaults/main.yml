@@ -12,3 +12,10 @@ apt_deps_legacy_files:
   # vscode (old key /etc/apt/keyrings/microsoft.asc is left alone: other
   # Microsoft repos on the machine may reference it)
   - /etc/apt/sources.list.d/vscode.list
+
+# Any other file in sources.list.d that still points at these repos (e.g. written
+# by add-apt-repository or kept by a release upgrade) is removed regardless of its
+# name. `keep` is the deb822 file the owning role writes.
+apt_deps_legacy_sources:
+  - regex: 'ppa\.launchpad(content)?\.net/zhangsongcui3371/fastfetch'
+    keep: fastfetch.sources

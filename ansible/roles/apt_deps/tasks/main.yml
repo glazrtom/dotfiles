@@ -14,4 +14,34 @@
     path: "{{ item }}"
     state: absent
   loop: "{{ apt_deps_legacy_files }}"
+  register: apt_deps_legacy_removed
   when: os_debian
+
+- name: Find other apt source files for legacy repositories
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: ["*.list", "*.sources"]
+    contains: "{{ item.regex }}"
+    excludes: "{{ item.keep }}"
+  loop: "{{ apt_deps_legacy_sources }}"
+  register: apt_deps_legacy_found
+  when: os_debian
+
+- name: Remove other apt source files for legacy repositories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ apt_deps_legacy_found.results | map(attribute='files') | flatten | map(attribute='path') }}"
+  register: apt_deps_legacy_found_removed
+  when: os_debian
+
+# A role's deb822 file may already be in place from an earlier, failed run, so
+# it won't report changed and won't refresh the cache itself.
+- name: Update apt cache after removing legacy sources
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+  when:
+    - os_debian
+    - apt_deps_legacy_removed is changed or apt_deps_legacy_found_removed is changed
