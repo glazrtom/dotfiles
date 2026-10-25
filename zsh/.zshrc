@@ -42,7 +42,9 @@ setopt hist_verify
 
 # Basic auto/tab complete:
 autoload -U compinit && compinit
-zstyle ':completion:*' menu select
+# fzf-tab replaces the completion menu
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 # Disable case sensitive completion
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zmodload zsh/complist
@@ -91,6 +93,26 @@ else
   ZSH_HIGHLIGHTING="$ZSH_BASE/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
   AUTOJUMP="$ZSH_BASE/autojump/autojump.zsh"
 fi
+
+# fzf: use fd as the file source
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+
+# ripgrep only reads a config file named by this variable
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+
+# fzf keybinds (Ctrl-R / Ctrl-T / Alt-C); `fzf --zsh` needs fzf >= 0.48
+if command -v fzf &>/dev/null; then
+  if fzf --zsh &>/dev/null; then
+    source <(fzf --zsh)
+  elif [ -f "$ZSH_BASE/doc/fzf/examples/key-bindings.zsh" ]; then
+    source "$ZSH_BASE/doc/fzf/examples/key-bindings.zsh"
+  fi
+fi
+
+# fzf-tab must load after compinit and before autosuggestions/syntax-highlighting
+[ -f "$DOTFILES_ZSH/fzf-tab/fzf-tab.plugin.zsh" ] && source "$DOTFILES_ZSH/fzf-tab/fzf-tab.plugin.zsh"
 
 # Source all
 source "$ZSH_AUTOSUGGESTIONS"

@@ -1,0 +1,28 @@
+- name: Install fd
+  become: "{{ os_linux }}"
+  package:
+    name: "{{ fd_package }}"
+    state: present
+
+- name: Create ~/.local/bin
+  file:
+    path: "{{ path_local }}/bin"
+    state: directory
+    mode: "0755"
+  when: os_debian
+
+# Debian installs the fd binary as `fdfind` to avoid a name clash.
+- name: Link fdfind as fd (Debian)
+  file:
+    src: /usr/bin/fdfind
+    dest: "{{ path_local }}/bin/fd"
+    state: link
+    force: yes
+  when: os_debian
+
+- name: Link fd config
+  file:
+    src: "{{ path_dotfiles }}/fd"
+    dest: "{{ path_config }}/fd"
+    state: link
+    force: yes

@@ -56,3 +56,6 @@
 [submodule "wifi-loc-control/upstream"]
 	path = wifi-loc-control/upstream
 	url = https://github.com/vborodulin/wifi-loc-control.git
+[submodule "zsh/fzf-tab"]
+	path = zsh/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab.git

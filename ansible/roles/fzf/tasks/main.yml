@@ -1,0 +1,5 @@
+- name: Install fzf
+  become: "{{ os_linux }}"
+  package:
+    name: fzf
+    state: present

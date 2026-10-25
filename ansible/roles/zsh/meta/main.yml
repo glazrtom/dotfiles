@@ -1,2 +1,5 @@
 dependencies:
   - role: fastfetch
+  - role: fd
+  - role: fzf
+  - role: ripgrep

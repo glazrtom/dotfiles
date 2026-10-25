@@ -51,9 +51,9 @@ alias -g CA="2>&1 | cat -A"
 alias -g NE="2> /dev/null"
 alias -g NULL="> /dev/null 2>&1"
 
-# find
-alias fd='find . -type d -iname'
-alias ff='find . -type f -iname'
+# find (replaced with `fd`)
+#alias fd='find . -type d -iname'
+#alias ff='find . -type f -iname'
 
 alias h='history'
 alias hgrep="fc -El 0 | grep"

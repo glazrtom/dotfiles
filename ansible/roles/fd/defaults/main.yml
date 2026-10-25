@@ -1,0 +1,2 @@
+# Debian/Ubuntu ship fd under the name fd-find (binary: fdfind).
+fd_package: "{{ 'fd-find' if os_debian else 'fd' }}"

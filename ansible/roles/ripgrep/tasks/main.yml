@@ -1,0 +1,12 @@
+- name: Install ripgrep
+  become: "{{ os_linux }}"
+  package:
+    name: ripgrep
+    state: present
+
+- name: Link ripgrep config
+  file:
+    src: "{{ path_dotfiles }}/ripgrep"
+    dest: "{{ path_config }}/ripgrep"
+    state: link
+    force: yes
