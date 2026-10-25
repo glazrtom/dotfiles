@@ -60,10 +60,14 @@
         name: tree-sitter-cli
         state: present
 
-- name: Install pynvim and ueberzug with pip (non-Debian)
+# Not on macOS: ueberzug is X11-only, and Homebrew's Python lacks the
+# `packaging` module the pip module needs (and is PEP 668 externally managed).
+- name: Install pynvim and ueberzug with pip (non-Debian Linux)
   pip:
     name:
       - pynvim
       - ueberzug
     executable: pip3
-  when: not os_debian
+  when:
+    - not os_debian
+    - not os_macos

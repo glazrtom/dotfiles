@@ -1,0 +1,4 @@
+# apt_deps removes stale apt sources that would otherwise make the apt upgrade
+# below fail (duplicate repo entries with conflicting Signed-By).
+dependencies:
+  - role: apt_deps

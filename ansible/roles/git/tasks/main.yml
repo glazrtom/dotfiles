@@ -6,13 +6,13 @@
     state: present
   when: os_linux
 
-- name: Copy git config
-  copy:
-    src: "{{ path_dotfiles }}/.gitconfig"
-    dest: "{{ path_home }}/.gitconfig"
-    owner: "{{ ansible_facts.user_id }}"
-    mode: '0644'
-    remote_src: true
+# Include rather than copy: ~/.gitconfig stays machine-owned, so user.name/email
+# and anything set by other tools (e.g. gh credential helpers) survive re-runs.
+- name: Include dotfiles git config
+  community.general.git_config:
+    name: include.path
+    scope: global
+    value: "{{ path_dotfiles }}/.gitconfig"
 
 - name: Configure git user name
   community.general.git_config:

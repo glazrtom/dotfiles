@@ -1,13 +1,5 @@
-# python3-debian is required on the target by the deb822_repository module.
-- name: Ensure python3-debian (needed by deb822_repository)
-  become: true
-  ansible.builtin.apt:
-    name: python3-debian
-    state: present
-    update_cache: true
-    cache_valid_time: 3600
-  when: os_debian
-
+# Legacy sources go first: while apt sees a repo twice with different
+# Signed-By values, every apt cache operation (incl. the one below) fails.
 - name: Remove legacy apt repository files
   become: true
   ansible.builtin.file:
@@ -22,6 +14,9 @@
     paths: /etc/apt/sources.list.d
     patterns: ["*.list", "*.sources"]
     contains: "{{ item.regex }}"
+    # Without this, contains is re.match()ed per line, i.e. anchored at the line
+    # start, so `deb https://…` / `URIs: https://…` lines never match.
+    read_whole_file: true
     excludes: "{{ item.keep }}"
   loop: "{{ apt_deps_legacy_sources }}"
   register: apt_deps_legacy_found
@@ -45,3 +40,13 @@
   when:
     - os_debian
     - apt_deps_legacy_removed is changed or apt_deps_legacy_found_removed is changed
+
+# python3-debian is required on the target by the deb822_repository module.
+- name: Ensure python3-debian (needed by deb822_repository)
+  become: true
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: os_debian
