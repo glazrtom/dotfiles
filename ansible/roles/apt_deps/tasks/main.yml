@@ -1,0 +1,17 @@
+# python3-debian is required on the target by the deb822_repository module.
+- name: Ensure python3-debian (needed by deb822_repository)
+  become: true
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: os_debian
+
+- name: Remove legacy apt repository files
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ apt_deps_legacy_files }}"
+  when: os_debian

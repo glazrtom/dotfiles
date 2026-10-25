@@ -1,0 +1,14 @@
+# .list files written by the old apt_repository setup. They must be gone before
+# a role adds its deb822 .sources file, otherwise apt sees the repo twice with
+# different Signed-By values and `apt update` fails.
+apt_deps_legacy_files:
+  # fastfetch PPA (apt_repository derives the name from the URI host+path;
+  # older ansible-core used ppa.launchpad.net, newer ppa.launchpadcontent.net)
+  - /etc/apt/sources.list.d/ppa_launchpad_net_zhangsongcui3371_fastfetch_ubuntu.list
+  - /etc/apt/sources.list.d/ppa_launchpadcontent_net_zhangsongcui3371_fastfetch_ubuntu.list
+  # kubectl
+  - /etc/apt/sources.list.d/kubernetes.list
+  - /etc/apt/keyrings/kubernetes-apt-keyring.asc
+  # vscode (old key /etc/apt/keyrings/microsoft.asc is left alone: other
+  # Microsoft repos on the machine may reference it)
+  - /etc/apt/sources.list.d/vscode.list
