@@ -114,6 +114,23 @@ fi
 # fzf-tab must load after compinit and before autosuggestions/syntax-highlighting
 [ -f "$DOTFILES_ZSH/fzf-tab/fzf-tab.plugin.zsh" ] && source "$DOTFILES_ZSH/fzf-tab/fzf-tab.plugin.zsh"
 
+# cd <Tab>: recursive directory picker (fd + fzf); everything else -> fzf-tab
+fzf-cd-recursive() {
+  if [[ $LBUFFER =~ '^cd +([^ ]*)$' ]]; then
+    local word=${match[1]} base=. query dir
+    if [[ -d ${~word} ]]; then base=${~word}; else query=$word; fi
+    dir=$(fd --type d --hidden --exclude .git . "$base" 2>/dev/null |
+      fzf --height 40% --reverse --query "$query" --select-1 --exit-0 \
+          --preview 'eza -1 --color=always {}')
+    [[ -n $dir ]] && LBUFFER="cd ${(q)dir}"
+    zle reset-prompt
+  else
+    zle fzf-tab-complete
+  fi
+}
+zle -N fzf-cd-recursive
+bindkey '^I' fzf-cd-recursive
+
 # Source all
 source "$ZSH_AUTOSUGGESTIONS"
 source "$ZSH_HIGHLIGHTING"
