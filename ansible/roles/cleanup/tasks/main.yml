@@ -1,0 +1,12 @@
+- name: Uninstall deprecated packages
+  become: "{{ os_linux }}"
+  package:
+    name: "{{ cleanup_packages }}"
+    state: absent
+  when: cleanup_packages | length > 0
+
+- name: Remove leftover files of deprecated software
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ cleanup_paths }}"

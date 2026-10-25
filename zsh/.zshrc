@@ -89,11 +89,9 @@ fi
 if [[ $IS_MAC -eq 0 || $IS_DEBIAN_BASED -eq 0 ]]; then
   ZSH_AUTOSUGGESTIONS="$ZSH_BASE/zsh-autosuggestions/zsh-autosuggestions.zsh"
   ZSH_HIGHLIGHTING="$ZSH_BASE/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-  AUTOJUMP="$ZSH_BASE/autojump/autojump.zsh"
 else
   ZSH_AUTOSUGGESTIONS="$ZSH_BASE/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
   ZSH_HIGHLIGHTING="$ZSH_BASE/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-  AUTOJUMP="$ZSH_BASE/autojump/autojump.zsh"
 fi
 
 # fzf: use fd as the file source
@@ -136,7 +134,6 @@ bindkey '^I' fzf-cd-recursive
 # Source all
 source "$ZSH_AUTOSUGGESTIONS"
 source "$ZSH_HIGHLIGHTING"
-source "$AUTOJUMP"
 source $DOTFILES_ZSH/powerlevel10k/powerlevel10k.zsh-theme
 # source $DOTFILES_ZSH/completions/*.zsh
 

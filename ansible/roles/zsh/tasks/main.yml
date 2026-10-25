@@ -6,7 +6,6 @@
       - zsh-syntax-highlighting
       - zsh-autosuggestions
       - eza
-      - autojump
     state: present
 
 - name: Link .zshrc file

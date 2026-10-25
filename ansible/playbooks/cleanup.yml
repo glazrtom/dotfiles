@@ -1,0 +1,4 @@
+- name: Uninstall deprecated software
+  hosts: all
+  roles:
+    - cleanup

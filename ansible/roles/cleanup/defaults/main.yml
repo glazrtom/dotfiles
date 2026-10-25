@@ -1,0 +1,10 @@
+# Software this repo used to install but no longer does. Removed on every init
+# run so existing machines converge. Append here instead of just deleting a
+# package from its role.
+cleanup_packages:
+  - autojump
+
+# Leftover state/config of removed software (absolute paths).
+cleanup_paths:
+  - "{{ path_local }}/share/autojump"
+  - "{{ path_home }}/Library/autojump"
