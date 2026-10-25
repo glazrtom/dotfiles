@@ -48,12 +48,16 @@ keybind = super+ctrl+right=resize_split:right,50
 keybind = super+shift+arrow_left=move_tab:-1
 keybind = super+shift+arrow_right=move_tab:1
 
-# macos-option-as-alt is intentionally left unset: on the Czech layout its
-# default is already "false", so Option keeps composing diacritics/digits
-# instead of being swallowed as Alt.
-#
-# fzf's Alt-C (cd into a fuzzy-picked dir) expects ESC+c. With Option left
-# as a compose key, send that sequence explicitly for just this chord.
+# Only the RIGHT Option key acts as Alt (sends ESC+key). The Czech layout puts
+# the number row and diacritics under Option, so the LEFT Option stays a compose
+# key (opt+2 = "2"). Right Option is what terminal apps such as zellij need for
+# their Alt chords (Alt h/j/k/l, Alt n, ...). Alt [ ] + - = send the US-layout
+# character, which sits on different keys on Czech, so those need Czech-key
+# duplicates on the zellij side.
+macos-option-as-alt = right
+
+# fzf's Alt-C (cd into a fuzzy-picked dir) expects ESC+c. Left Option is still a
+# compose key, so send that sequence explicitly for just this chord.
 keybind = alt+c=esc:c
 
 # Tab switching, Czech layout: the number row lives under Option (opt+2 = "2"),

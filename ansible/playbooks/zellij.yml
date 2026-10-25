@@ -1,0 +1,6 @@
+# Workstation config: limited to the [local] group so it never touches the
+# servers in inventory.ini.
+- name: Setup zellij
+  hosts: local
+  roles:
+    - zellij

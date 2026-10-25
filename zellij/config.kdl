@@ -1,0 +1,28 @@
+// Zellij config. Keybinds are intentionally NOT overridden: zellij's stock
+// keymap applies, so upstream improvements carry over. Alt chords need
+// `macos-option-as-alt = right` in ghostty/config (right Option = Alt).
+//
+// Reference for every option: `zellij setup --dump-config`.
+
+// `theme` is rewritten in place by the `zellij-theme` function (zsh/zsh_alias),
+// which fzf-picks a theme with live preview. Keep it on a single line.
+theme "dracula"
+
+ui {
+    pane_frames {
+        rounded_corners true
+    }
+}
+
+// Zellij copies via OSC 52 by default (the terminal sets the clipboard). That
+// breaks in terminals without OSC 52 support, so pipe selections to the macOS
+// clipboard directly. Over SSH the remote zellij has no pbcopy: use OSC 52 there
+// by removing this line. Linux: "wl-copy" (wayland) / "xclip -selection clipboard" (x11).
+copy_command "pbcopy"
+
+show_release_notes false
+mouse_hover_tips false
+
+session_serialization true
+serialize_pane_viewport true
+scrollback_lines_to_serialize 10000

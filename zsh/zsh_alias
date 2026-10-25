@@ -513,3 +513,42 @@ jwt() {
     jq -R --argjson idx "$idx" "$jqprog" <<<"$t"
   fi
 }
+
+# Bare `zellij` opens the welcome screen (session picker / new session). Any
+# arguments pass through, and inside a session (ZELLIJ is set) it never nests.
+# `default_layout "welcome"` would not work: sessions created from the welcome
+# screen would load it again.
+zellij() {
+  if (( $# == 0 )) && [[ -z $ZELLIJ ]]; then
+    command zellij -l welcome
+  else
+    command zellij "$@"
+  fi
+}
+alias z='zellij'
+
+# Live zellij theme picker: moving the fzf cursor rewrites the `theme` line in
+# zellij/config.kdl and zellij hot-reloads it, so a running session re-skins
+# immediately. Enter keeps the theme, Esc restores the previous one.
+zellij-theme() {
+  local cfg="$DOTFILES/zellij/config.kdl" orig pick
+  local themes=(
+    ansi ao atelier-sulphurpool blade-runner catppuccin-frappe catppuccin-latte
+    catppuccin-macchiato catppuccin-mocha cyber-noir dayfox dracula everforest-dark
+    everforest-light flexoki-dark gruvbox-dark gruvbox-light iceberg-dark iceberg-light
+    kanagawa lucario menace molokai-dark night-owl nightfox nord one-half-dark onedark
+    pencil-light retro-wave solarized-dark solarized-light tokyo-night tokyo-night-dark
+    tokyo-night-light tokyo-night-storm vesper
+  )
+  orig=$(sed -n 's/^theme "\(.*\)"$/\1/p' "$cfg")
+  [[ -n $orig ]] || { echo "no single-line theme \"...\" in $cfg" >&2; return 1; }
+  pick=$(printf '%s\n' "${themes[@]}" | fzf --prompt='zellij theme> ' --query="$orig" \
+    --bind "focus:execute-silent(sed -i.bak 's/^theme \".*\"\$/theme \"{}\"/' '$cfg')")
+  if [[ -n $pick ]]; then
+    sed -i.bak "s/^theme \".*\"\$/theme \"$pick\"/" "$cfg"
+  else
+    sed -i.bak "s/^theme \".*\"\$/theme \"$orig\"/" "$cfg"
+  fi
+  rm -f "$cfg.bak"
+  echo "zellij theme: ${pick:-$orig}"
+}

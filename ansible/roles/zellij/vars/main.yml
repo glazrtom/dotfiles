@@ -1,0 +1,10 @@
+path_config_zellij: "{{ path_config }}/zellij"
+
+# Fallback when apt has no zellij: the static musl release tarball (contains
+# just the `zellij` binary).
+zellij_arch: "{{ 'aarch64' if ansible_facts['architecture'] == 'aarch64' else 'x86_64' }}"
+zellij_url: "https://github.com/zellij-org/zellij/releases/latest/download/zellij-{{ zellij_arch }}-unknown-linux-musl.tar.gz"
+zellij_apt_candidate: >-
+  {{ os_debian and (zellij_apt_policy.stdout | default('')) is search('Candidate:')
+     and (zellij_apt_policy.stdout | default('')) is not search('Candidate:\\s+\\(none\\)') }}
+zellij_use_tarball: "{{ os_linux and not os_archlinux and not zellij_apt_candidate }}"

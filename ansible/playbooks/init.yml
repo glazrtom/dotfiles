@@ -1,6 +1,6 @@
 # Core workstation bundle: updates the system, clones dotfiles, then sets up
 # git, zsh (+fastfetch), nvim (+config_dir), ranger (+config_dir),
-# alacritty (+config_dir) via role deps, WiFiLocControl (macOS only), and
+# zellij (+config_dir), alacritty (+config_dir) via role deps, WiFiLocControl (macOS only), and
 # finally cleanup (uninstalls software this repo no longer installs).
 # Homebrew itself is installed by ansible/bootstrap.sh, not by this playbook.
 - name: Set up workstation
@@ -21,5 +21,6 @@
     - zsh
     - nvim
     - ranger
+    - zellij
     - wifi_loc_control
     - cleanup
