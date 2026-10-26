@@ -7,11 +7,9 @@ font-size = 14
 background-opacity = 0.9
 background-blur = true
 
-# Ghostty's default is 2px per side, which leaves text nearly flush against the
-# window edge. window-padding-balance spreads the leftover pixels from a
-# non-exact cell fit evenly instead of piling them on the right/bottom edges.
-window-padding-x = 8
-window-padding-y = 6
+# No padding.
+window-padding-x = 0
+window-padding-y = 0
 window-padding-balance = true
 
 # macOS keeps apps alive in the Dock with no windows open; Ghostty's default here
@@ -41,13 +39,6 @@ keybind = super+ctrl+down=resize_split:down,50
 keybind = super+ctrl+left=resize_split:left,50
 keybind = super+ctrl+right=resize_split:right,50
 
-# Ghostty has no default binding for reordering tabs — move_tab exists as an
-# action but is unbound. super+shift+arrow_left/right are free in the defaults
-# (Ghostty's own previous_tab/next_tab use super+shift+[ / ]), and arrow keys
-# are layout-independent, so no Czech Unicode-trigger duplicate is needed here.
-keybind = super+shift+arrow_left=move_tab:-1
-keybind = super+shift+arrow_right=move_tab:1
-
 # Only the RIGHT Option key acts as Alt (sends ESC+key). The Czech layout puts
 # the number row and diacritics under Option, so the LEFT Option stays a compose
 # key (opt+2 = "2"). Right Option is what terminal apps such as zellij need for
@@ -59,6 +50,29 @@ macos-option-as-alt = right
 # fzf's Alt-C (cd into a fuzzy-picked dir) expects ESC+c. Left Option is still a
 # compose key, so send that sequence explicitly for just this chord.
 keybind = alt+c=esc:c
+
+# Ghostty's macOS defaults map alt+←/→ to esc:b / esc:f (readline word jumps).
+# Inside zellij, ESC f is Alt f = ToggleFloatingPanes, so ⌥→ popped a floating
+# pane. Send the xterm Alt+arrow sequences instead: zsh binds them to
+# backward/forward-word (zsh/.zshrc), and zellij/config.kdl unbinds Alt
+# Left/Right so they pass through.
+keybind = alt+arrow_left=text:\x1b[1;3D
+keybind = alt+arrow_right=text:\x1b[1;3C
+
+# Cmd chords for zellij: Ghostty can't tell left from right Option, so ⌥←/→ stay
+# word-jump and cmd+shift+arrows move pane focus instead. Each sends the ESC+letter
+# that zellij's stock Alt binding listens for: Alt h/l = MoveFocusOrTab
+# Left/Right, Alt k/j = MoveFocus Up/Down, Alt f = ToggleFloatingPanes. This
+# replaces cmd+shift+←/→ tab reordering (move_tab; still in the command palette),
+# Ghostty's cmd+shift+↑/↓ (jump_to_prompt) and cmd+f (start_search). Plain
+# cmd+arrows keep their defaults (line start/end, jump_to_prompt). cmd+[ ] did
+# not work (probably the menu items for them take the key before keybinds).
+# Outside zellij the shell just receives ESC h/l/k/j/f.
+keybind = super+shift+arrow_left=esc:h
+keybind = super+shift+arrow_right=esc:l
+keybind = super+shift+arrow_up=esc:k
+keybind = super+shift+arrow_down=esc:j
+keybind = super+f=esc:f
 
 # Tab switching, Czech layout: the number row lives under Option (opt+2 = "2"),
 # so cmd+opt+<key> is the natural press for "go to tab N" — but Ghostty only

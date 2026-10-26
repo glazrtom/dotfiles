@@ -1,12 +1,24 @@
-// Zellij config. Keybinds are intentionally NOT overridden: zellij's stock
-// keymap applies, so upstream improvements carry over. Alt chords need
-// `macos-option-as-alt = right` in ghostty/config (right Option = Alt).
+// Zellij config. Keybinds are intentionally left alone except for unbinding
+// Alt Left/Right (see below): zellij's stock keymap applies, so upstream
+// improvements carry over. Alt chords need `macos-option-as-alt = right` in
+// ghostty/config (right Option = Alt).
 //
 // Reference for every option: `zellij setup --dump-config`.
 
 // `theme` is rewritten in place by the `zellij-theme` function (zsh/zsh_alias),
 // which fzf-picks a theme with live preview. Keep it on a single line.
 theme "dracula"
+
+// ⌥←/⌥→ belong to the shell (zsh forward/backward-word, zsh/.zshrc).
+// Stock zellij binds them to MoveFocusOrTab, which steals them from the
+// shell. Alt h / Alt l still move focus.
+// Ghostty sends these as \e[1;3D / \e[1;3C (see ghostty/config); its default
+// esc:b / esc:f would hit Alt f = ToggleFloatingPanes instead.
+keybinds {
+    shared_except "locked" {
+        unbind "Alt Left" "Alt Right"
+    }
+}
 
 ui {
     pane_frames {
