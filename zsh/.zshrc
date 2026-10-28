@@ -55,6 +55,11 @@ _comp_options+=(globdots)               # Include hidden files.
 bindkey -e
 bindkey '^ ' autosuggest-accept
 
+# open current command line in $EDITOR
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
 # change dir shortcut
 setopt autocd
 
